@@ -8,13 +8,13 @@ type ParserResult = {
 }
 
 let runParser (line : string) = 
-    let result = run cCommand line
+    let result = run cExpr line
     match result with
     | Success (expr, _) -> { successfull = true; expression = expr; 
                              message = System.String.Empty }
 
     | Failure _ -> { successfull = false; expression = CEmpty; 
-                                   message = sprint result }
+                     message = sprint result }
 
 let extractInnerExpression (expression : Expression) =
     match expression with

@@ -50,7 +50,7 @@ let createParserForwardedToRef<'a>() =
     let wrapperParser = { parseFn = innerFn; label = "unknown" }
     wrapperParser, parserRef
 
-let rValue, rValueRef = createParserForwardedToRef<Expression>()
+let cValue, cValueRef = createParserForwardedToRef<Expression>()
 //end_region: ParserForwardedToRef
 
 let idchar = satisfy (fun ch -> Char.IsLetterOrDigit ch) "idchar"
@@ -117,7 +117,7 @@ let singleQuotedString =
     <?> "string"
 
 let cString = 
-    [ singleQuotedString; doubleQuotedString ] |> choice
+    [ singleQuotedString; doubleQuotedString ] |> choice //fix -- parsing with '
     |>> CString
     <?> "string"
 //end_region: String parsing
@@ -201,31 +201,27 @@ let cParameter =
     |>> CParameter
     <?> "parameter"
 
-let cSimpleCommand =
-    cId
-    |>> (fun id -> CCommand (id, CEmpty))
-    <?> "command"
-
-let cCommandWithParameters =
+let cCommand =
     let pquery = [ cParameter; cArgument; ] |> choice .>> spaces1
 
-    cId .>> spaces1 .>>. (many1 pquery)
-    |>> (fun (id, q) -> CCommand (id, CQuery q))
-    <?> "command with parameters"
+    cId .>>. opt (spaces1 >>. (many pquery))
+    |>> (fun (id, optQuery) -> match optQuery with
+                               | Some q -> CCommand (id, CQuery q)
+                               | None -> CCommand (id, CEmpty))
+    <?> "command"
 
 let cPipeline =
     let pipeline = pchar '|'
-    let cmd = [ cCommandWithParameters; cSimpleCommand; ] |> choice //fix -- make a single one
 
-    let sepThenP = pipeline >>. spaces1 >>. cmd
-    cmd .>>. many1 sepThenP
+    let sepThenP = pipeline >>. spaces1 >>. cCommand
+    cCommand .>>. many1 sepThenP
     |>> (fun (p, plist) -> p::plist)
     |>> CPipeline
     <?> "pipeline"
 
-let cCommand =
-    [ cPipeline; cCommandWithParameters; cSimpleCommand; cBool; cString; cNumber ] |> choice
+let cExpr =
+    [ cPipeline; cCommand; cBool; cString; cNumber ] |> choice
     |>> CExpr
     <?> "command"
 
-rValueRef := cCommand
+cValueRef := cExpr

@@ -16,7 +16,7 @@ namespace ConsoleApp.Commands
 
             Program.Close();
 
-            return ExecutionResult.Success(new object());
+            return ExecutionResult.Empty();
         }
     }
 }
