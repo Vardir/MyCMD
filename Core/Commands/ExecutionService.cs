@@ -56,10 +56,21 @@ namespace Core.Commands
             if (expr.IsCCommand)
             {
                 var (id, query) = CExtern.extractCmd(expr);
-                if (commands.TryGetValue(id, out Command cmd))
-                    return cmd.Execute(query);
-                else
-                    return ExecutionResult.Error($"cmd.error: can not find command '{id}'");
+                return extractAndExecute(id, query, ExecutionResult.Empty());
+            }
+            else if (expr.IsCPipeline)
+            {
+                var cmds = CExtern.extractPipeline(expr);
+                ExecutionResult result = ExecutionResult.Empty();
+                foreach (var cmd in cmds)
+                {
+                    result = extractAndExecute(cmd.Item1, cmd.Item2, result);
+                    if (!result.isSuccessfull && !result.isEmpty)
+                    {
+                        return ExecutionResult.Error($"{result.errorMessage}\ncmd.error: can not compute pipeline");
+                    }
+                }
+                return result;
             }
             else if (expr.IsCBoolean)
                 return ExecutionResult.Success(CExtern.extractBoolean(expr));
@@ -69,6 +80,14 @@ namespace Core.Commands
                 return ExecutionResult.Success(CExtern.extractString(expr));
 
             return ExecutionResult.Error("cmd.error: can not execute the given expression");
+
+            ExecutionResult extractAndExecute(string id, Expression query, ExecutionResult input)
+            {                
+                if (commands.TryGetValue(id, out Command cmd))
+                    return cmd.Execute(query, input);
+                else
+                    return ExecutionResult.Error($"cmd.error: can not find command '{id}'");
+            }
         }
     }
 }

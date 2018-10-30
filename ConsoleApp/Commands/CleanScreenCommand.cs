@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Core.Commands;
-using static CParser;
+﻿using Core.Commands;
 
 namespace ConsoleApp.Commands
 {
@@ -10,16 +8,9 @@ namespace ConsoleApp.Commands
                                            "Cleans off the console. Requires no parameters.",
                                            "cls"){}
 
-        public override ExecutionResult Execute(Expression expr)
+        protected override ExecutionResult Execute(ExecutionResult input)
         {
-            bool queryIsEmpty = true;
-            if (expr.IsCQuery)
-            {
-                var list = CExtern.extractQuery(expr);
-                var any = list.Any();
-                queryIsEmpty = !list.Any();
-            }
-            if (!expr.IsCEmpty && !queryIsEmpty)
+            if (queryItems.Count > 0)
                 return ExecutionResult.Error("cls.error: the command does not take any parameters/arguments");
 
             Program.CleanScreen();

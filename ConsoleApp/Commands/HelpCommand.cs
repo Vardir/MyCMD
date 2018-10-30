@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Core.Commands;
+﻿using Core.Commands;
 using static CParser;
 
 namespace ConsoleApp.Commands
@@ -10,21 +9,16 @@ namespace ConsoleApp.Commands
                                     "Prints out the information about command.",
                                     "help <cmd>\n\tcmd -- command ID"){}
 
-        public override ExecutionResult Execute(Expression expr)
+        protected override ExecutionResult Execute(ExecutionResult input)
         {
-            if (!expr.IsCQuery)
-                return ExecutionResult.Error("help.error: the command requires a query to execute on");
-
-            var query = CExtern.extractQuery(expr);
-
-            Expression arg = null;
-            try { arg = query.Single(); }
-            catch { }
-
-            if (arg != null && arg.IsCArgument)
+            if (queryItems.Count != 1)
+                return ExecutionResult.Error("help.error: the command requires 1 argument");
+            
+            Expression arg = queryItems.First.Value;
+            if (arg.IsCArgument)
                 arg = CExtern.extractInnerExpression(arg);
 
-            if (arg == null || !arg.IsCVar)
+            if (!arg.IsCVar)
                 return ExecutionResult.Error("help.error: the command requires argument: command ID");
 
             string id = CExtern.extractVar(arg);

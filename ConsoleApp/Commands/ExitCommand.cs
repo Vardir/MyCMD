@@ -1,5 +1,4 @@
 ﻿using Core.Commands;
-using static CParser;
 
 namespace ConsoleApp.Commands
 {
@@ -9,9 +8,9 @@ namespace ConsoleApp.Commands
                                     "Quit application immediate. Requires no parameters.", 
                                     "exit") {}
 
-        public override ExecutionResult Execute(Expression expr)
+        protected override ExecutionResult Execute(ExecutionResult _)
         {
-            if (!expr.IsCEmpty)
+            if (queryItems.Count > 0)
                 return ExecutionResult.Error("exit.error: the command does not take any parameters/arguments");
 
             Program.Close();

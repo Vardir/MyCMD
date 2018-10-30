@@ -32,6 +32,11 @@ let extractCmd (expression : Expression) =
     | CCommand (id, query) -> (id, query)
     | _ -> raise (System.ArgumentException("argument is not a command"))
 
+let extractPipeline (expression : Expression) =
+    match expression with
+    | CPipeline lst -> lst |> List.map (fun e -> extractCmd e) |> Seq.ofList
+    | _ -> raise (System.ArgumentException("argument is not a pipeline"))
+
 let extractBoolean (expression : Expression) =
     match expression with
     | CBoolean b -> b
