@@ -51,7 +51,8 @@ namespace ConsoleApp
                 Console.WriteLine();
                 var result = executionService.Execute(query);
                 Interpret(result);
-                Console.WriteLine();
+                if (!result.isEmpty)
+                    Console.WriteLine();
             }
             while (times < 3000);
 
@@ -72,7 +73,11 @@ namespace ConsoleApp
         }
         private static void Interpret(ExecutionResult executionResult)
         {
-            if (executionResult.successfull)
+            if (executionResult.isEmpty)
+            {
+                //do nothing
+            }
+            else if (executionResult.isSuccessfull)
                 Print(executionResult.result?.ToString());
             else
                 Print(executionResult.errorMessage, Message.Error);

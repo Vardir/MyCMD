@@ -1,4 +1,5 @@
-﻿using Core.Commands;
+﻿using System.Linq;
+using Core.Commands;
 using static CParser;
 
 namespace ConsoleApp.Commands
@@ -11,12 +12,19 @@ namespace ConsoleApp.Commands
 
         public override ExecutionResult Execute(Expression expr)
         {
-            if (!expr.IsCEmpty)
+            bool queryIsEmpty = true;
+            if (expr.IsCQuery)
+            {
+                var list = CExtern.extractQuery(expr);
+                var any = list.Any();
+                queryIsEmpty = !list.Any();
+            }
+            if (!expr.IsCEmpty && !queryIsEmpty)
                 return ExecutionResult.Error("cls.error: the command does not take any parameters/arguments");
 
             Program.CleanScreen();
 
-            return ExecutionResult.Success(new object());
+            return ExecutionResult.Empty();
         }
     }
 }
