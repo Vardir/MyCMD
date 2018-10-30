@@ -45,9 +45,6 @@
     <Content Include="packages.config" />
     <Compile Include="TextInput.fs" />
     <Compile Include="ParserDef.fs" />
-    <Compile Include="RParser.fs" />
-    <Compile Include="RInterpreter.fs" />
-    <Compile Include="Startup.fs" />
     <Compile Include="CParser.fs" />
     <Compile Include="CExtern.fs" />
   </ItemGroup>

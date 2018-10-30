@@ -26,7 +26,7 @@ type Expression =
     | CNumber    of float
     | CString    of string
     | CBoolean   of bool
-    | CVar       of Expression
+    | CVar       of string
     | CParameter of string
     | CArgument  of Expression
     | CList      of Expression list
@@ -62,7 +62,6 @@ let cId =
 
 let cVar =
     cId
-    |>> CString
     |>> CVar
 
 let cType = 
@@ -216,19 +215,16 @@ let cCommandWithParameters =
 
 let cPipeline =
     let pipeline = pchar '|'
-    let cmd = [ cCommandWithParameters; cSimpleCommand; ] |> choice
+    let cmd = [ cCommandWithParameters; cSimpleCommand; ] |> choice //fix -- make a single one
 
     let sepThenP = pipeline >>. spaces1 >>. cmd
     cmd .>>. many1 sepThenP
     |>> (fun (p, plist) -> p::plist)
-    //many1 (cmd .>> spaces1 .>> pipeline .>> spaces1 .>>. cmd)
-    //|>> List.map (fun (x1, x2) -> x1::x2)
-    //sepBy1 cmd pipeline
     |>> CPipeline
     <?> "pipeline"
 
 let cCommand =
-    [ cPipeline; cCommandWithParameters; cSimpleCommand; ] |> choice
+    [ cPipeline; cCommandWithParameters; cSimpleCommand; cBool; cString; cNumber ] |> choice
     |>> CExpr
     <?> "command"
 
