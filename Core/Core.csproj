@@ -49,6 +49,15 @@
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\ExecutionResult.cs" />
     <Compile Include="Commands\ExecutionService.cs" />
+    <Compile Include="Commands\Math\DivCommand.cs" />
+    <Compile Include="Commands\Math\Base\MathCommand.cs" />
+    <Compile Include="Commands\Math\Base\MathOneArgumentCommand.cs" />
+    <Compile Include="Commands\Math\Base\MathTwoArgumentsCommand.cs" />
+    <Compile Include="Commands\Math\MulCommand.cs" />
+    <Compile Include="Commands\Math\PowCommand.cs" />
+    <Compile Include="Commands\Math\SqrtCommand.cs" />
+    <Compile Include="Commands\Math\SubCommand.cs" />
+    <Compile Include="Commands\Math\SumCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

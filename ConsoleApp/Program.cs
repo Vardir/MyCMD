@@ -2,6 +2,7 @@
 using Core.Commands;
 using System.Reflection;
 using ConsoleApp.Commands;
+using Core.Commands.Math;
 
 namespace ConsoleApp
 {
@@ -66,7 +67,8 @@ namespace ConsoleApp
             executionService.AddCommands(new Command[]
             {
                 new ExitCommand(), new CleanScreenCommand(), new HelpCommand(),
-                new SumCommand(), new MulCommand()
+                new SumCommand(), new SubCommand(), new MulCommand(), new DivCommand(),
+                new PowCommand(), new SqrtCommand()
             });
 
             //activate parser

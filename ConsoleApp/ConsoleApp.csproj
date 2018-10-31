@@ -46,8 +46,6 @@
     <Compile Include="Commands\CleanScreenCommand.cs" />
     <Compile Include="Commands\ExitCommand.cs" />
     <Compile Include="Commands\HelpCommand.cs" />
-    <Compile Include="Commands\MulCommand.cs" />
-    <Compile Include="Commands\SumCommand.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
