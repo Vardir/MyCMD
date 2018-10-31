@@ -17,7 +17,7 @@
         private ExecutionResult(object result)
         {
             isEmpty = result == null;
-            isSuccessfull = true;
+            isSuccessfull = result != null;
             this.result = result;
             errorMessage = string.Empty;
         }

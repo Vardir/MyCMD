@@ -1,5 +1,6 @@
-﻿using Core.Commands;
-using static CParser;
+﻿using ParserLib;
+using Core.Commands;
+using static ParserLib.CmdParser;
 
 namespace ConsoleApp.Commands
 {
@@ -16,12 +17,12 @@ namespace ConsoleApp.Commands
             
             Expression arg = queryItems.First.Value;
             if (arg.IsCArgument)
-                arg = CExtern.extractInnerExpression(arg);
+                arg = Interop.extractInnerExpression(arg);
 
             if (!arg.IsCVar)
                 return ExecutionResult.Error("help.error: the command requires argument: command ID");
 
-            string id = CExtern.extractVar(arg);
+            string id = Interop.extractVar(arg);
             Command cmd = ExecutionService.FindCommand(id);
             if (cmd == null)
                 return ExecutionResult.Error($"help.error: can not find command with ID '{id}'");

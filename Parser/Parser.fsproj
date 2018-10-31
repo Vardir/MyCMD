@@ -45,8 +45,8 @@
     <Content Include="packages.config" />
     <Compile Include="TextInput.fs" />
     <Compile Include="ParserDef.fs" />
-    <Compile Include="CParser.fs" />
-    <Compile Include="CExtern.fs" />
+    <Compile Include="CmdParser.fs" />
+    <Compile Include="Interop.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Core">

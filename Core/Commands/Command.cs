@@ -1,6 +1,7 @@
 ﻿using System;
+using ParserLib;
 using System.Collections.Generic;
-using static CParser;
+using static ParserLib.CmdParser;
 
 namespace Core.Commands
 {
@@ -29,7 +30,7 @@ namespace Core.Commands
                 return Execute(pipedResult);
             if (expression.IsCQuery)
             {
-                var query = CExtern.extractQuery(expression);
+                var query = Interop.extractQuery(expression);
                 foreach (var item in query)
                 {
                     if (item.IsCArgument || item.IsCParameter)

@@ -1,6 +1,7 @@
 ﻿using System;
+using ParserLib;
 using System.Collections.Generic;
-using static CParser;
+using static ParserLib.CmdParser;
 
 namespace Core.Commands
 {
@@ -43,10 +44,10 @@ namespace Core.Commands
         }
         public ExecutionResult Execute(string line)
         {
-            var result = CExtern.runParser(line);
+            var result = Interop.runParser(line);
             
             if (result.successfull)
-                return Execute(CExtern.extractInnerExpression(result.expression));
+                return Execute(Interop.extractInnerExpression(result.expression));
             else
                 return ExecutionResult.Error(result.message);
         }
@@ -55,12 +56,12 @@ namespace Core.Commands
         {
             if (expr.IsCCommand)
             {
-                var (id, query) = CExtern.extractCmd(expr);
+                var (id, query) = Interop.extractCmd(expr);
                 return extractAndExecute(id, query, ExecutionResult.Empty());
             }
             else if (expr.IsCPipeline)
             {
-                var cmds = CExtern.extractPipeline(expr);
+                var cmds = Interop.extractPipeline(expr);
                 ExecutionResult result = ExecutionResult.Empty();
                 foreach (var cmd in cmds)
                 {
@@ -73,11 +74,11 @@ namespace Core.Commands
                 return result;
             }
             else if (expr.IsCBoolean)
-                return ExecutionResult.Success(CExtern.extractBoolean(expr));
+                return ExecutionResult.Success(Interop.extractBoolean(expr));
             else if (expr.IsCNumber)
-                return ExecutionResult.Success(CExtern.extractNumber(expr));
+                return ExecutionResult.Success(Interop.extractNumber(expr));
             else if (expr.IsCString)
-                return ExecutionResult.Success(CExtern.extractString(expr));
+                return ExecutionResult.Success(Interop.extractString(expr));
 
             return ExecutionResult.Error("cmd.error: can not execute the given expression");
 

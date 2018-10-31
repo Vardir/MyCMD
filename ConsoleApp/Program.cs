@@ -14,7 +14,7 @@ namespace ConsoleApp
         static Program()
         {
             var version = Assembly.GetExecutingAssembly().GetName().Version;
-            Header = $"MyCMD v{version.Major}.{version.Minor}";
+            Header = $"MyCMD v{version.Major}.{version.Minor}.{version.Build}";
         }
 
         public static void Close()
@@ -65,7 +65,8 @@ namespace ConsoleApp
 
             executionService.AddCommands(new Command[]
             {
-                new ExitCommand(), new CleanScreenCommand(), new HelpCommand()
+                new ExitCommand(), new CleanScreenCommand(), new HelpCommand(),
+                new SumCommand(), new MulCommand()
             });
 
             //activate parser
