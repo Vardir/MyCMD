@@ -1,42 +1,86 @@
-﻿using ParserLib;
-using Core.Continuations;
-using static ParserLib.CmdParser;
+﻿using System.Text;
+using Core.Attributes;
 
 namespace Core.Commands
 {
+    [Description("Prints out the information about the given command.")]
     public class HelpCommand : Command
     {
-        public HelpCommand() : base("help",
-                                    "Prints out the information about command.",
-                                    "help <cmd>\n\tcmd -- command ID") {}
+        [StringParameter(Key="id")]
+        [Description("ID of the command")]
+        protected string id;
 
-        protected override ExecutionResult Execute(Continuation<Expression> continuation, ExecutionResult input)
+        private readonly StringBuilder builder;
+
+        public HelpCommand() : base("help")
         {
-            Expression arg = null;
+            builder = new StringBuilder();
+        }
 
-            continuation = continuation.BeginWith(e => e.IsCArgument,
-                e => arg = Interop.extractInnerExpression(e),
-                "expected command argument").Break();
-
-            if (continuation.Failure != ContinuationFailure.None)
-            {
-                var message = continuation.Failure.GetMessageOn(
-                    onEnded: $"help.error: not enough parameters",
-                    onEmpty: $"help.error: not enough parameters",
-                    onNotEnded: $"help.error: too many arguments",
-                    defaults: $"help.error: {continuation.FailureMessage}");
-                if (message != null)
-                    return ExecutionResult.Error(message);        
-            }
-            if (!arg.IsCVar)
-                return ExecutionResult.Error("help.error: the command requires argument: command ID");
-
-            string id = Interop.extractVar(arg);
+        protected override ExecutionResult Execute()
+        {            
             Command cmd = ExecutionService.FindCommand(id);
             if (cmd == null)
-                return ExecutionResult.Error($"help.error: can not find command with ID '{id}'");
+                return ExecutionResult.Error($"can not find command with ID '{id}'");
+            string syntax = BuildSyntax(cmd);
+            return ExecutionResult.Success($"ID: {id}\nDescription: {cmd.Description}\nSyntax: {syntax}");
+        }
 
-            return ExecutionResult.Success($"ID: {id}\nDescription: {cmd.Description}\nSyntax: {cmd.Syntax}");
+        private string BuildSyntax(Command cmd)
+        {
+            builder.Clear();
+            builder.Append(cmd.Id);
+            builder.Append(' ');
+            Parameter[] array = cmd.GetParameters();
+            for (int p = 0; p < array.Length; p++)
+            {
+                Parameter parameter = array[p];
+                if (parameter.IsFlag)
+                {
+                    builder.Append('[');
+                    builder.Append('-');
+                    builder.Append(parameter.Id);
+                    builder.Append(']');
+                    builder.Append(' ');
+                }
+                else if (parameter.IsOptional)
+                {
+                    builder.Append('[');
+                    builder.Append('-');
+                    builder.Append(parameter.Id);
+                    builder.Append(' ');
+                    builder.Append("<arg>");
+                    builder.Append(']');
+                    builder.Append(' ');
+                }
+                else if (parameter.HasDefault)
+                {
+                    builder.Append('-');
+                    builder.Append(parameter.Id);
+                    builder.Append(' ');
+                    builder.Append("[arg]");
+                    builder.Append(' ');
+                }
+                else if (!parameter.HasDefault)
+                {
+                    builder.Append('-');
+                    builder.Append(parameter.Id);
+                    builder.Append(' ');
+                    builder.Append("<arg>");
+                    builder.Append(' ');
+                }
+            }
+            if (array.Length > 0)
+            {
+                builder.Append('\n');
+                builder.Append("where:");
+                for (int p = 0; p < array.Length; p++)
+                {
+                    Parameter parameter = array[p];
+                    builder.Append($"\n\t-{parameter.Id} -- {parameter.Description}");
+                }
+            }
+            return builder.ToString();
         }
     }
 }

@@ -1,10 +1,11 @@
-﻿namespace Core.Commands.Math
+﻿using Core.Attributes;
+
+namespace Core.Commands.Math
 {
+    [Description("Sums the given arguments if they are numbers.")]
     public class SumCommand : MathTwoArgumentsCommand
     {
-        public SumCommand() : base("sum",
-                                   "Sums the given arguments if they are numbers.",
-                                   "sum <arg1> <arg2>\n\targ1 -- the left-side value\n\targ2 -- the right-side value"){}
+        public SumCommand() : base("sum"){}
 
         protected override (string, double) Calculate(double left, double right) => (null, left + right);
     }

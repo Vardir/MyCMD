@@ -1,10 +1,11 @@
-﻿namespace Core.Commands.Math
+﻿using Core.Attributes;
+
+namespace Core.Commands.Math
 {
+    [Description("Divides the given arguments if they are numbers.")]
     public class DivCommand : MathTwoArgumentsCommand
     {
-        public DivCommand() : base("div",
-                                   "Devides the given arguments if they are numbers.",
-                                   "div <arg1> <arg2>\n\targ1 -- the left-side value\n\targ2 -- the right-side value")
+        public DivCommand() : base("div")
         { }
 
         protected override (string, double) Calculate(double left, double right)

@@ -14,7 +14,6 @@ module CmdParser =
 
     //"text"    --string literal    +
     //-a        --parameter         +
-    //var       --item              +
     //|         --pipeline operator +
     //2.0       --number            +
     //true      --boolean           +
@@ -28,7 +27,6 @@ module CmdParser =
         | CNumber    of float
         | CString    of string
         | CBoolean   of bool
-        | CVar       of string
         | CParameter of string
         | CArgument  of Expression
         | CList      of Expression list
@@ -58,14 +56,10 @@ module CmdParser =
     let idchar = satisfy (fun ch -> Char.IsLetterOrDigit ch) "idchar"
     let idstart = satisfy (fun ch -> Char.IsLetter ch || ch = '_') "idstart"
 
-    let cId = 
+    let nonQuotedString = 
         idstart .>>. manyChars idchar
         |>> (fun (c, str) -> (string c) + str)
-
-    let cVar =
-        cId
-        |>> CVar
-
+        
     let cType = 
         [ pstring "number"  >>% TNumber
           pstring "boolean" >>% TBoolean
@@ -119,7 +113,7 @@ module CmdParser =
         <?> "string"
 
     let cString = 
-        [ singleQuotedString; doubleQuotedString ] |> choice //fix -- parsing with '
+        [ singleQuotedString; doubleQuotedString; nonQuotedString ] |> choice //fix -- parsing with '
         |>> CString
         <?> "string"
     //end_region: String parsing
@@ -192,21 +186,21 @@ module CmdParser =
         <?> "list"
 
     let cArgument = 
-        [ cNumber; cString; cBool; cVar (*add list*) ]
+        [ cNumber; cString; cBool; (*add list*) ]
         |> choice
         |>> CArgument
         <?> "argument"
 
     let cParameter =
         let dash = pchar '-'
-        dash >>. cId
+        dash >>. nonQuotedString
         |>> CParameter
         <?> "parameter"
 
     let cCommand =
         let pquery = [ cParameter; cArgument; ] |> choice .>> spaces1
 
-        cId .>>. opt (spaces1 >>. (many pquery))
+        nonQuotedString .>>. opt (spaces1 >>. (many pquery))
         |>> (fun (id, optQuery) -> match optQuery with
                                    | Some q -> CCommand (id, CQuery q)
                                    | None -> CCommand (id, CEmpty))

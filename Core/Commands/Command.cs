@@ -1,84 +1,224 @@
 ﻿using System;
 using ParserLib;
 using System.Linq;
-using Core.Continuations;
-using System.Collections.Generic;
+using Core.Attributes;
+using System.Reflection;
 using static ParserLib.CmdParser;
+using System.Collections.Generic;
 
 namespace Core.Commands
 {
     public abstract class Command
     {
+        private int _index;
+        private string pipelinedParameter;
+        private Parameter[] parametersArray;
+
+        private readonly List<string> parametersOrder;
+        private readonly Dictionary<string, Parameter> parameters;
+
         public string Id { get; }
-        public string Description { get; }
-        public string Syntax { get; }
-        private LinkedList<Expression> queryItems;
+        public string Description { get; private set; }
         public ExecutionService ExecutionService { get; set; }
 
-        public Command(string id, string description, string syntax)
+        public Command(string id)
         {
             Id = id;
-            Description = description;
-            Syntax = syntax;
-            queryItems = new LinkedList<Expression>();
+            parameters = new Dictionary<string, Parameter>();
+            parametersOrder = new List<string>();
+            Initialize();
         }
 
         public ExecutionResult Execute(Expression expression) => Execute(expression, ExecutionResult.Empty());
         public ExecutionResult Execute(Expression expression, ExecutionResult pipedResult)
         {
-            queryItems.Clear();
+            UnsetAllParameters();
+            if (!pipedResult.isEmpty)
+            {
+                if (pipelinedParameter == null)
+                    return Error("command does not accept input from the pipeline");
+                Parameter parameter = parameters[pipelinedParameter];
+                if (!parameter.CanAssign(pipedResult.result))
+                    return Error($"pipelined value is of invalid type, expected: {parameter.GetValueType()} but got {pipedResult.GetType()}");
+                parameter.SetValue(pipedResult.result);
+            }
             if (expression.IsCEmpty)
-                return Execute(Continuation<Expression>.Empty(), pipedResult);
+                return Execute();
             if (expression.IsCQuery)
             {
                 var query = Interop.extractQuery(expression);
+                _index = 0;
+                Parameter previousParameter = null;
                 foreach (var item in query)
                 {
-                    if (item.IsCArgument || item.IsCParameter)
-                        queryItems.AddLast(item);
+                    if (item.IsCParameter)
+                    {
+                        string id = Interop.extractParameter(item);
+                        var (current, message) = PushParameter(id, previousParameter);
+                        if (current == null)
+                            return Error(message);
+                        previousParameter = current;
+                    }
+                    else if (item.IsCArgument)
+                    {
+                        if (_index >= parametersOrder.Count)
+                            return Error("too many parameters given");
+                        Parameter parameter = previousParameter ?? parameters[parametersOrder[_index]];
+                        if (parameter.IsSet && parameter.Id == pipelinedParameter && previousParameter == null)
+                        {
+                            if (++_index >= parametersOrder.Count)
+                                return Error("too many parameters given");
+                            parameter = parameters[parametersOrder[_index]];
+                        }
+                        object value = Interop.extractObject(Interop.extractInnerExpression(item));
+                        string message = SetParameter(parameter, value);
+                        if (message != null)
+                            return Error(message);
+                        previousParameter = null;
+                        _index++;
+                    }
                     else
-                        throw new NotImplementedException();
+                        throw new InvalidOperationException("command must contain only parameters and arguments");
                 }
-                return Execute(Continuation.Of(queryItems.GetEnumerator()), pipedResult);
+                var set = parameters.Select(kvp => kvp.Value).Where(p => !p.IsSet);
+                foreach (var parameter in set)
+                {
+                    if (parameter.IsFlag || parameter.IsOptional)
+                        parameter.Set();
+                    else
+                        return Error($"parameter {parameter.Id} is not set");
+                }
+                return Execute();
             }
             throw new NotImplementedException();
-            //todo: add cases
+        }
+        
+        protected abstract ExecutionResult Execute();
+                
+        protected ExecutionResult Error(string message) => ExecutionResult.Error($"{Id}.error: {message}");
+        protected internal Parameter[] GetParameters()
+        {
+            if (parametersArray != null)
+                return parametersArray;
+            parametersArray = new Parameter[parameters.Count];
+            int i = 0;
+            foreach (var id in parametersOrder)
+            {
+                parametersArray[i] = parameters[id];
+                i++;
+            }
+            foreach (var kvp in parameters)
+            {
+                if (parametersArray.Contains(kvp.Value))
+                    continue;
+                parametersArray[i] = kvp.Value;
+                i++;
+            }
+            return parametersArray;
         }
 
-        protected abstract ExecutionResult Execute(Continuation<Expression> continuation, ExecutionResult input);
-        
-        protected bool HasItem(Func<Expression, bool> pattern)
+        private void Initialize()
         {
-            return queryItems.FirstOrDefault(pattern) != null;
-        }
-        protected bool HasParameter(string value)
-        {
-            var node = queryItems.First;
-            while (node != null)
+            Type type = GetType();
+            FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+            for (int f = 0; f < fields.Length; f++)
             {
-                Expression expression = node.Value;
-                if (expression.IsCParameter)
+                ReadFieldAttributes(fields[f]);
+            }
+            Attribute[] attributes = Attribute.GetCustomAttributes(type);
+            for (int a = 0; a < attributes.Length; a++)
+            {
+                Attribute attribute = attributes[a];
+                if (attribute is DescriptionAttribute descriptionAttr)
                 {
-                    string parameter = Interop.extractParameter(expression);
-                    if (parameter == value)
-                        return true;
+                    Description = descriptionAttr.Value;
                 }
-                node = node.Next;
+                else if (attribute is CommandFlagAttribute commandFlagAttr)
+                {
+                    Parameter parameter = new Parameter(commandFlagAttr.Id, commandFlagAttr.Description);
+                    parameters.Add(parameter.Id, parameter);
+                }
             }
-            return false;
         }
-        protected Expression GetItem(Func<Expression, bool> pattern)
+        private void ReadFieldAttributes(FieldInfo field)
         {
-            Expression expression = queryItems.FirstOrDefault(pattern);
-            return expression;
-        }
-        protected (bool, Expression) AsArgument(Expression expr)
-        {
-            if (expr.IsCArgument)
+            bool isCommandParameter = false;
+            bool isOptional = false;
+            bool isPipelined = false;
+            bool hasDefault = false;
+            object defaultValue = null;
+            string id = field.Name.ToLower();
+            string description = $"Parameter {id}";
+
+            Attribute[] attributes = Attribute.GetCustomAttributes(field);
+            for (int a = 0; a < attributes.Length; a++)
             {
-                return (true, Interop.extractInnerExpression(expr));
+                Attribute attribute = attributes[a];
+                if (attribute is DescriptionAttribute descriptionAttr)
+                    description = descriptionAttr.Value;
+                else if (attribute is ParameterAttribute parameterAttr)
+                {
+                    if (!parameterAttr.IsAllowedType(field.FieldType))
+                        throw new InvalidOperationException("the attribute attached to the field has an invalid type");
+                    hasDefault = parameterAttr.HasDefault;
+                    if (hasDefault)
+                        defaultValue = parameterAttr.GetDefaultValue();
+                    id = parameterAttr.Key ?? id;
+                    isOptional = parameterAttr.IsOptional;
+                    isCommandParameter = true;
+                }
+                else if (attribute is PipelineAttribute)
+                {
+                    if (pipelinedParameter != null)
+                        throw new InvalidOperationException("the pipeline attribute must be attached only once per class");
+                    isPipelined = true;
+                }
             }
-            return (false, null);
+            if (!isCommandParameter)
+                return;
+            if (isPipelined)
+                pipelinedParameter = id;
+            Parameter commandParameter;
+            if (hasDefault)
+                commandParameter = new Parameter(id, description, isOptional, defaultValue, this, field);
+            else
+                commandParameter = new Parameter(id, description, this, field);
+            parameters.Add(id, commandParameter);
+            parametersOrder.Add(id);
         }
+        private void UnsetAllParameters()
+        {
+            foreach (var kvp in parameters)
+            {
+                kvp.Value.Unset();
+            }
+        }
+       
+        private string SetParameter(Parameter parameter, object value)
+        {
+            if (parameter.IsSet)
+                return $"parameter {parameter.Id} is already assigned";
+            if (!parameter.CanAssign(value))
+                return $"parameter {parameter.Id} accepts {parameter.GetValueType()} but got {value.GetType()}";
+            parameter.SetValue(value);
+            return null;
+        }
+        private (Parameter, string) PushParameter(string id, Parameter previous)
+        {
+            if (!parameters.TryGetValue(id, out Parameter parameter))
+                return (null, $"command does not accept parameter {id}");
+
+            if (previous != null)
+            {
+                if (previous.HasDefault)
+                {
+                    previous.Set();
+                    _index++;
+                }
+                else
+                    return (null, $"parameter {previous.Id} accepts value but got nothing");
+            }
+            return (parameter, null);
+        }        
     }
 }

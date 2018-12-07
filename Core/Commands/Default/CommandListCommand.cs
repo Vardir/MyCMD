@@ -1,22 +1,15 @@
-﻿using Core.Continuations;
-using static ParserLib.CmdParser;
+﻿using Core.Attributes;
 
 namespace Core.Commands
 {
+    [Description("Prints out all available commands.")]
     public class CommandListCommand : Command
     {
-        public CommandListCommand() : base("clist",
-                                           "Prints out all available commands.",
-                                           "clist")
+        public CommandListCommand() : base("clist")
         { }
 
-        protected override ExecutionResult Execute(Continuation<Expression> continuation, ExecutionResult input)
+        protected override ExecutionResult Execute()
         {
-            continuation = continuation.BeginWith(e => true, (e) => { }, null).Break();
-
-            if (continuation.Failure != ContinuationFailure.EmptySource)
-                return ExecutionResult.Error("clist.error: the command does not take any parameters/arguments");
-
             var commands = ExecutionService.GetAllCommandsIDs();            
             return ExecutionResult.Success(string.Join("; ", commands));
         }

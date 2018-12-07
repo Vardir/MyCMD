@@ -5,7 +5,7 @@ namespace Core.Commands.Math
 {
     public abstract class MathCommand : Command
     {
-        public MathCommand(string id, string description, string syntax) : base(id, description, syntax)
+        public MathCommand(string id) : base(id)
         { }
 
         protected (bool, double) GetNumber(Expression arg)

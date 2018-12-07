@@ -1,10 +1,11 @@
-﻿namespace Core.Commands.Math
+﻿using Core.Attributes;
+
+namespace Core.Commands.Math
 {
+    [Description("Subtract the given arguments if they are numbers.")]
     public class SubCommand : MathTwoArgumentsCommand
     {
-        public SubCommand() : base("sub",
-                                   "Subtract the given arguments if they are numbers.",
-                                   "sub <arg1> <arg2>\n\targ1 -- the left-side value\n\targ2 -- the right-side value")
+        public SubCommand() : base("sub")
         { }
 
         protected override (string, double) Calculate(double left, double right) => (null, left - right);

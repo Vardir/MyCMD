@@ -59,7 +59,9 @@ module Interop =
         | CString s -> s
         | _ -> raise (System.ArgumentException("argument is not a string"))
 
-    let extractVar (expression : Expression) =
+    let extractObject (expression : Expression) =
         match expression with
-        | CVar v -> v
-        | _ -> raise (System.ArgumentException("argument is not a variable"))
+        | CBoolean b -> box(b)
+        | CNumber n -> box(n)
+        | CString s -> s :> obj
+        | _ -> raise (System.ArgumentException("argument can not be extracted"))

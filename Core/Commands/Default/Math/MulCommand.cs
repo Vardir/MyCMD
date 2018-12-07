@@ -1,10 +1,11 @@
-﻿namespace Core.Commands.Math
+﻿using Core.Attributes;
+
+namespace Core.Commands.Math
 {
+    [Description("Multiplies the given arguments if they are numbers.")]
     public class MulCommand : MathTwoArgumentsCommand
     {
-        public MulCommand() : base("mul",
-                                   "Multiplies the given arguments if they are numbers.",
-                                   "mul <arg1> <arg2>\n\targ1 -- the left-side value\n\targ2 -- the right-side value")
+        public MulCommand() : base("mul")
         { }
 
         protected override (string, double) Calculate(double left, double right) => (null, left * right);

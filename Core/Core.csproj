@@ -46,12 +46,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\BoolParameterAttribute.cs" />
+    <Compile Include="Attributes\CommandFlagAttribute.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\Default\CommandListCommand.cs" />
     <Compile Include="Commands\Default\HelpCommand.cs" />
-    <Compile Include="Continuations\Continuation.cs" />
-    <Compile Include="Continuations\ContinuationHelpers.cs" />
-    <Compile Include="Continuations\ContinuationFailure.cs" />
+    <Compile Include="Attributes\DescriptionAttribute.cs" />
+    <Compile Include="Attributes\NumberParameterAttribute.cs" />
+    <Compile Include="Attributes\ParameterAttribute.cs" />
+    <Compile Include="Attributes\PipelineAttribute.cs" />
+    <Compile Include="Attributes\StringParameterAttribute.cs" />
+    <Compile Include="Commands\Parameter.cs" />
     <Compile Include="Commands\ExecutionResult.cs" />
     <Compile Include="Commands\ExecutionService.cs" />
     <Compile Include="Commands\Default\Math\DivCommand.cs" />
@@ -63,6 +68,7 @@
     <Compile Include="Commands\Default\Math\SqrtCommand.cs" />
     <Compile Include="Commands\Default\Math\SubCommand.cs" />
     <Compile Include="Commands\Default\Math\SumCommand.cs" />
+    <Compile Include="Commands\TestCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
