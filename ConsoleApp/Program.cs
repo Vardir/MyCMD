@@ -66,7 +66,7 @@ namespace ConsoleApp
 
             executionService.AddCommands(new Command[]
             {
-                new ExitCommand(), new CleanScreenCommand(), new HelpCommand(),
+                new ExitCommand(), new CleanScreenCommand(), new HelpCommand(), new CommandListCommand(),
                 new SumCommand(), new SubCommand(), new MulCommand(), new DivCommand(),
                 new PowCommand(), new SqrtCommand()
             });

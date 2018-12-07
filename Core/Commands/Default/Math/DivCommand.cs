@@ -4,7 +4,7 @@
     {
         public DivCommand() : base("div",
                                    "Devides the given arguments if they are numbers.",
-                                   "div <arg1> <arg2>\n\arg1 -- the left-side value\n\targ2 -- the right-side value")
+                                   "div <arg1> <arg2>\n\targ1 -- the left-side value\n\targ2 -- the right-side value")
         { }
 
         protected override (string, double) Calculate(double left, double right)

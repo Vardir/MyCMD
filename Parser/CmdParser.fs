@@ -84,8 +84,8 @@ module CmdParser =
 
     let cEscapedChar =
         [
-            ("\\\"", '\"'); ("\\\\", '\\'); ("\\/", '/'); ("\\b", '\b')
-            ("\\f", '\f'); ("\\r", '\r'); ("\\n", '\n'); ("\\t", '\t')
+            ("\\\"", '\"'); ("\\\\", '\\'); ("\\/", '/'); //("\\b", '\b')
+            //("\\f", '\f'); ("\\r", '\r'); ("\\n", '\n'); ("\\t", '\t')
         ]
         |> List.map (fun (toMatch, result) -> pstring_c toMatch >>% result)
         |> choice

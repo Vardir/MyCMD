@@ -14,8 +14,14 @@ namespace Core.Commands.Math
                 return (true, Interop.extractNumber(arg));
             else if (!arg.IsCArgument)
                 return (false, 0.0);
-
-            return (true, Interop.extractNumber(Interop.extractInnerExpression(arg)));
+            var inner = Interop.extractInnerExpression(arg);
+            return GetNumber(inner);
+        }
+        protected bool TryGetNumber(Expression arg, out double number)
+        {
+            var (success, nb) = GetNumber(arg);
+            number = nb;
+            return success;
         }
     }
 }

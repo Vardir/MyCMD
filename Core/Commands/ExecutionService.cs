@@ -8,7 +8,7 @@ namespace Core.Commands
     public class ExecutionService
     {
         private readonly Dictionary<string, Command> commands;
-        
+
         public ExecutionService()
         {
             commands = new Dictionary<string, Command>();
@@ -50,6 +50,13 @@ namespace Core.Commands
                 return Execute(Interop.extractInnerExpression(result.expression));
             else
                 return ExecutionResult.Error(result.message);
+        }
+        public IEnumerable<string> GetAllCommandsIDs()
+        {
+            foreach (var kvp in commands)
+            {
+                yield return kvp.Key;
+            }
         }
 
         private ExecutionResult Execute(Expression expr)

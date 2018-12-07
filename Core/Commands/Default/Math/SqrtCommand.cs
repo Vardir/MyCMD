@@ -4,7 +4,7 @@
     {
         public SqrtCommand() : base("sqrt",
                                     "Returns the square root of the specified number.",
-                                    "sqrt <arg1> <arg2>\n\arg1 -- the left-side value\n\targ2 -- the right-side value")
+                                    "sqrt <arg>\n\targ -- the number")
         { }
 
         protected override (string, double) Calculate(double operand) => (null, System.Math.Sqrt(operand));

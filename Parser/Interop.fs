@@ -24,6 +24,11 @@ module Interop =
         | CArgument expr -> expr
         | _ -> raise (System.ArgumentException("argument is not an expression container"))
 
+    let extractParameter (expression : Expression) =
+        match expression with
+        | CParameter p -> p
+        | _ -> raise (System.ArgumentException("argument is not a parameter"));
+
     let extractQuery (expression : Expression) =
         match expression with
         | CQuery lst -> Seq.ofList lst
