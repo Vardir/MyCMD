@@ -3,12 +3,12 @@
 namespace Core.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public sealed class CommandFlagAttribute : Attribute
+    public sealed class WithFlagAttribute : Attribute
     {
         public string Id { get; }
         public string Description { get; }
 
-        public CommandFlagAttribute(string id, string description)
+        public WithFlagAttribute(string id, string description)
         {
             Id = id;
             Description = description;

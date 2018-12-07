@@ -57,6 +57,11 @@ namespace Core.Commands
                         var (current, message) = PushParameter(id, previousParameter);
                         if (current == null)
                             return Error(message);
+                        if (current.IsFlag)
+                        {
+                            current.Set();
+                            continue;
+                        }
                         previousParameter = current;
                     }
                     else if (item.IsCArgument)
@@ -83,7 +88,9 @@ namespace Core.Commands
                 var set = parameters.Select(kvp => kvp.Value).Where(p => !p.IsSet);
                 foreach (var parameter in set)
                 {
-                    if (parameter.IsFlag || parameter.IsOptional)
+                    if (parameter.IsFlag)
+                        continue;
+                    if (parameter.IsOptional)
                         parameter.Set();
                     else
                         return Error($"parameter {parameter.Id} is not set");
@@ -95,6 +102,14 @@ namespace Core.Commands
         
         protected abstract ExecutionResult Execute();
                 
+        protected bool IsFlagSet(string id)
+        {
+            if (!parameters.TryGetValue(id, out Parameter parameter))
+                return false;
+            if (parameter.IsFlag)
+                return parameter.IsSet;
+            return false;
+        }
         protected ExecutionResult Error(string message) => ExecutionResult.Error($"{Id}.error: {message}");
         protected internal Parameter[] GetParameters()
         {
@@ -133,7 +148,7 @@ namespace Core.Commands
                 {
                     Description = descriptionAttr.Value;
                 }
-                else if (attribute is CommandFlagAttribute commandFlagAttr)
+                else if (attribute is WithFlagAttribute commandFlagAttr)
                 {
                     Parameter parameter = new Parameter(commandFlagAttr.Id, commandFlagAttr.Description);
                     parameters.Add(parameter.Id, parameter);
