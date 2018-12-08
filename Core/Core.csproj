@@ -46,8 +46,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\BoolParameterAttribute.cs" />
     <Compile Include="Attributes\CommandFlagAttribute.cs" />
+    <Compile Include="Attributes\FlagAttribute.cs" />
     <Compile Include="Commands\Command.cs" />
     <Compile Include="Commands\Default\CommandListCommand.cs" />
     <Compile Include="Commands\Default\HelpCommand.cs" />

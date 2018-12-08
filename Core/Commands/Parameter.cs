@@ -10,7 +10,6 @@ namespace Core.Commands
 
         public bool IsFlag { get; }
         public bool IsOptional { get; }
-        public bool HasDefault { get; }
         public bool IsSet { get; private set; }
         public object DefaultValue { get; }
         public string Id { get; }
@@ -22,23 +21,19 @@ namespace Core.Commands
             IsOptional = isOptional;
             Description = description;
         }
-
-        public Parameter(string id, string description)
-            : this(id, description, true)
-        {
-            IsFlag = true;
-        }
-        public Parameter(string id, string description, Command container, FieldInfo backingField)
+        
+        public Parameter(string id, string description, bool isFlag, Command container, FieldInfo backingField)
             : this(id, description, false)
         {
-            HasDefault = false;
+            IsOptional = isFlag;
+            IsFlag = isFlag;
             this.container = container;
             this.backingField = backingField;
         }
-        public Parameter(string id, string description, bool isOptional, object defaultValue, Command container, FieldInfo backingField)
-            : this(id, description, isOptional)
+        public Parameter(string id, string description, object defaultValue, Command container, FieldInfo backingField)
+            : this(id, description, true)
         {
-            HasDefault = true;
+            IsOptional = true;
             this.container = container;
             DefaultValue = defaultValue;
             this.backingField = backingField;
@@ -47,20 +42,27 @@ namespace Core.Commands
         public void Unset()
         {
             IsSet = false;
-            if (HasDefault)
+            if (IsFlag)
+                backingField.SetValue(container, false);
+            else if (IsOptional)
                 backingField.SetValue(container, DefaultValue);
         }
         public void Set()
         {
-            if (!HasDefault && !IsFlag)
+            if (!IsOptional && !IsFlag)
                 throw new InvalidOperationException("can not set parameter without default value");
             IsSet = true;
-            backingField?.SetValue(container, DefaultValue);
+            if (IsFlag)
+                backingField.SetValue(container, true);
+            else
+                backingField.SetValue(container, DefaultValue);
         }
         public void SetValue(object value)
         {
+            if (IsFlag)
+                throw new InvalidOperationException("can no set flag to a custom value");
             IsSet = true;
-            backingField?.SetValue(container, value);
+            backingField.SetValue(container, value);
         }
 
         public bool CanAssign(object value) => backingField.FieldType == value.GetType();

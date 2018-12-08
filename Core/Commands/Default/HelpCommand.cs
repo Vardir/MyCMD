@@ -53,15 +53,7 @@ namespace Core.Commands
                     builder.Append(']');
                     builder.Append(' ');
                 }
-                else if (parameter.HasDefault)
-                {
-                    builder.Append('-');
-                    builder.Append(parameter.Id);
-                    builder.Append(' ');
-                    builder.Append("[arg]");
-                    builder.Append(' ');
-                }
-                else if (!parameter.HasDefault)
+                else
                 {
                     builder.Append('-');
                     builder.Append(parameter.Id);

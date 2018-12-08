@@ -85,10 +85,10 @@ namespace Core.Commands
                     else
                         throw new InvalidOperationException("command must contain only parameters and arguments");
                 }
-                var set = parameters.Select(kvp => kvp.Value).Where(p => !p.IsSet);
-                foreach (var parameter in set)
+                foreach (var kvp in parameters)
                 {
-                    if (parameter.IsFlag)
+                    Parameter parameter = kvp.Value;
+                    if (parameter.IsSet || parameter.IsFlag)
                         continue;
                     if (parameter.IsOptional)
                         parameter.Set();
@@ -101,15 +101,7 @@ namespace Core.Commands
         }
         
         protected abstract ExecutionResult Execute();
-                
-        protected bool IsFlagSet(string id)
-        {
-            if (!parameters.TryGetValue(id, out Parameter parameter))
-                return false;
-            if (parameter.IsFlag)
-                return parameter.IsSet;
-            return false;
-        }
+        
         protected ExecutionResult Error(string message) => ExecutionResult.Error($"{Id}.error: {message}");
         protected internal Parameter[] GetParameters()
         {
@@ -148,11 +140,6 @@ namespace Core.Commands
                 {
                     Description = descriptionAttr.Value;
                 }
-                else if (attribute is WithFlagAttribute commandFlagAttr)
-                {
-                    Parameter parameter = new Parameter(commandFlagAttr.Id, commandFlagAttr.Description);
-                    parameters.Add(parameter.Id, parameter);
-                }
             }
         }
         private void ReadFieldAttributes(FieldInfo field)
@@ -160,7 +147,7 @@ namespace Core.Commands
             bool isCommandParameter = false;
             bool isOptional = false;
             bool isPipelined = false;
-            bool hasDefault = false;
+            bool isFlag = false;
             object defaultValue = null;
             string id = field.Name.ToLower();
             string description = $"Parameter {id}";
@@ -175,9 +162,10 @@ namespace Core.Commands
                 {
                     if (!parameterAttr.IsAllowedType(field.FieldType))
                         throw new InvalidOperationException("the attribute attached to the field has an invalid type");
-                    hasDefault = parameterAttr.HasDefault;
-                    if (hasDefault)
+                    if (parameterAttr.IsOptional)
                         defaultValue = parameterAttr.GetDefaultValue();
+                    if (parameterAttr is FlagAttribute)
+                        isFlag = true;
                     id = parameterAttr.Key ?? id;
                     isOptional = parameterAttr.IsOptional;
                     isCommandParameter = true;
@@ -194,12 +182,13 @@ namespace Core.Commands
             if (isPipelined)
                 pipelinedParameter = id;
             Parameter commandParameter;
-            if (hasDefault)
-                commandParameter = new Parameter(id, description, isOptional, defaultValue, this, field);
+            if (isOptional && !isFlag)
+                commandParameter = new Parameter(id, description, defaultValue, this, field);
             else
-                commandParameter = new Parameter(id, description, this, field);
+                commandParameter = new Parameter(id, description, isFlag, this, field);
             parameters.Add(id, commandParameter);
-            parametersOrder.Add(id);
+            if (!isFlag)
+                parametersOrder.Add(id);
         }
         private void UnsetAllParameters()
         {
@@ -225,7 +214,7 @@ namespace Core.Commands
 
             if (previous != null)
             {
-                if (previous.HasDefault)
+                if (previous.IsOptional)
                 {
                     previous.Set();
                     _index++;

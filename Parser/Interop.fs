@@ -43,12 +43,7 @@ module Interop =
         match expression with
         | CPipeline lst -> lst |> List.map (fun e -> extractCmd e) |> Seq.ofList
         | _ -> raise (System.ArgumentException("argument is not a pipeline"))
-
-    let extractBoolean (expression : Expression) =
-        match expression with
-        | CBoolean b -> b
-        | _ -> raise (System.ArgumentException("argument is not a boolean"))
-
+        
     let extractNumber (expression : Expression) =
         match expression with
         | CNumber n -> n
@@ -61,7 +56,6 @@ module Interop =
 
     let extractObject (expression : Expression) =
         match expression with
-        | CBoolean b -> box(b)
         | CNumber n -> box(n)
         | CString s -> s :> obj
         | _ -> raise (System.ArgumentException("argument can not be extracted"))

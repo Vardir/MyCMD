@@ -4,11 +4,12 @@ module CmdParser =
 
     open System
     open ParserDef
+    open System.Text
+    open System.Text.RegularExpressions
 
     //exit                                  --command without parameters/arguments                  +
     //help exit                             --command with one argument                             +
     //read -f "file.txt"                    --command with parameter with argument                  +
-    //read -f "1.txt", read -f "2.txt"      --sequence of commands, results are combined in list    -
     //copy "1.txt", "2.txt", "3.txt"        --list of vales                                         -
     //read -f "1.txt" | write -f "2.txt"    --pipeline                                              +
 
@@ -16,17 +17,14 @@ module CmdParser =
     //-a        --parameter         +
     //|         --pipeline operator +
     //2.0       --number            +
-    //true      --boolean           +
 
     type DataType =
         | TString
         | TNumber
-        | TBoolean
 
     type Expression =
         | CNumber    of float
         | CString    of string
-        | CBoolean   of bool
         | CParameter of string
         | CArgument  of Expression
         | CList      of Expression list
@@ -53,24 +51,17 @@ module CmdParser =
     let cValue, cValueRef = createParserForwardedToRef<Expression>()
     //end_region: ParserForwardedToRef
 
-    let idchar = satisfy (fun ch -> Char.IsLetterOrDigit ch) "idchar"
-    let idstart = satisfy (fun ch -> Char.IsLetter ch || ch = '_') "idstart"
+    let unqotedchar = satisfy (fun ch -> Regex.IsMatch(string ch, "[\w-#@&\^\+=\{\}\[\]'!`\.,]")) "unchar"
+    let unqotedchar_f = satisfy (fun ch -> Regex.IsMatch(string ch, "[\w#@&\^\+=\{\}\[\]'!`\.,]")) "unchar"
 
     let nonQuotedString = 
-        idstart .>>. manyChars idchar
-        |>> (fun (c, str) -> (string c) + str)
+        unqotedchar_f .>>. manyChars unqotedchar
+        |>> (fun (f, tail) -> (string f) + tail)
         
     let cType = 
         [ pstring "number"  >>% TNumber
-          pstring "boolean" >>% TBoolean
           pstring "string"  >>% TString ]
         |> choice
-
-    let cBool =
-        let ctrue = (pstring "true")   >>% (CBoolean true)
-        let cfalse = (pstring "false") >>% (CBoolean false)
-        ctrue <|> cfalse
-        <?> "bool"
 
     //region: String parsing
     let cUnescapedChar =
@@ -107,13 +98,13 @@ module CmdParser =
         quotedString quote
         <?> "string"
 
-    let singleQuotedString =
-        let quote = pchar '\''
-        quotedString quote
-        <?> "string"
+    //let singleQuotedString =
+    //    let quote = pchar '\''
+    //    quotedString quote
+    //    <?> "string"
 
     let cString = 
-        [ singleQuotedString; doubleQuotedString; nonQuotedString ] |> choice //fix -- parsing with '
+        [ doubleQuotedString; nonQuotedString ] |> choice //fix -- parsing with '
         |>> CString
         <?> "string"
     //end_region: String parsing
@@ -177,7 +168,7 @@ module CmdParser =
     //end_region: Numbers parsing
 
     let cLiteral =
-        [ cNumber; cString; cBool ]
+        [ cNumber; cString; ]
         |> choice
 
     let cList valueParser =
@@ -186,7 +177,7 @@ module CmdParser =
         <?> "list"
 
     let cArgument = 
-        [ cNumber; cString; cBool; (*add list*) ]
+        [ cNumber; cString; (*add list*) ]
         |> choice
         |>> CArgument
         <?> "argument"
@@ -216,7 +207,7 @@ module CmdParser =
         <?> "pipeline"
 
     let cExpr =
-        [ cPipeline; cCommand; cBool; cString; cNumber ] |> choice
+        [ cPipeline; cCommand; cString; cNumber ] |> choice
         |>> CExpr
         <?> "command"
 

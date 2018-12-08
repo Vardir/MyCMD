@@ -80,8 +80,6 @@ namespace Core.Commands
                 }
                 return result;
             }
-            else if (expr.IsCBoolean)
-                return ExecutionResult.Success(Interop.extractBoolean(expr));
             else if (expr.IsCNumber)
                 return ExecutionResult.Success(Interop.extractNumber(expr));
             else if (expr.IsCString)

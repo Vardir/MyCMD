@@ -6,7 +6,6 @@ namespace Core.Attributes
     public abstract class ParameterAttribute : Attribute
     {
         public bool IsOptional { get; set; }
-        public bool HasDefault { get; set; }
         public string Key { get; set; }
 
         public ParameterAttribute()
