@@ -53,9 +53,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <Project>{0d02d808-8ad2-4d2f-9299-d2352f87db1d}</Project>
-      <Name>Core</Name>
+    <ProjectReference Include="..\CMD.Standard\CMD.Standard.csproj">
+      <Project>{e2526f66-eab3-4444-8599-4c89530ae1f2}</Project>
+      <Name>CMD.Standard</Name>
     </ProjectReference>
     <ProjectReference Include="..\Parser\Parser.fsproj">
       <Project>{1782b318-725c-45c0-b6f9-eddbc57c847a}</Project>

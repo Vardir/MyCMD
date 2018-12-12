@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>core</AssemblyName>
+    <RootNamespace>Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\Core\bin\Debug\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Parser">
+      <HintPath>..\Core\bin\Debug\Parser.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
