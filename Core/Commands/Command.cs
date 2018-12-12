@@ -39,7 +39,7 @@ namespace Core.Commands
                     return Error("command does not accept input from the pipeline");
                 Parameter parameter = parameters[pipelinedParameter];
                 if (!parameter.CanAssign(pipedResult.result))
-                    return Error($"pipelined value is of invalid type, expected: {parameter.GetValueType()} but got {pipedResult.GetType()}");
+                    return Error($"pipelined value is of invalid type, expected: {parameter.GetValueType()} but got {pipedResult.result?.GetType()}");
                 parameter.SetValue(pipedResult.result);
             }
             if (expression.IsCEmpty)
