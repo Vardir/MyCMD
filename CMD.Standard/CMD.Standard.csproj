@@ -4,15 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>core</AssemblyName>
     <RootNamespace>Core</RootNamespace>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="FSharp.Core">
-      <HintPath>..\Core\bin\Debug\FSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Parser">
-      <HintPath>..\Core\bin\Debug\Parser.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\Parser\Parser.fsproj" />
   </ItemGroup>
 
 </Project>

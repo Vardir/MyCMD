@@ -19,6 +19,10 @@ namespace Core.Commands
         [Description("A test double parameter")]
         protected double dParam;
 
+        [ArrayParameter(Key = "a")]
+        [Description("A test array parameter")]
+        protected object[] aParam;
+
         public TestCommand() : base("test")
         {
 

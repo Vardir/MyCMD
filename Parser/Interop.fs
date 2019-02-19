@@ -52,10 +52,16 @@ module Interop =
     let extractString (expression : Expression) =
         match expression with
         | CString s -> s
-        | _ -> raise (System.ArgumentException("argument is not a string"))
+        | _ -> raise (System.ArgumentException("argument is not a string"))    
 
-    let extractObject (expression : Expression) =
+    let rec extractObject (expression : Expression) =
         match expression with
         | CNumber n -> box(n)
         | CString s -> s :> obj
+        | CArray  a -> (a |> Array.map extractObject) :> obj
         | _ -> raise (System.ArgumentException("argument can not be extracted"))
+
+    let extractArray (expression : Expression) =
+        match expression with
+        | CArray a -> a |> Array.map extractObject
+        | _ -> raise (System.ArgumentException("argument is not a list"))

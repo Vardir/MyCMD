@@ -1,8 +1,7 @@
 ﻿using System;
 using Core.Commands;
-using System.Reflection;
-using ConsoleApp.Commands;
 using Core.Commands.Math;
+using ConsoleApp.Commands;
 
 namespace ConsoleApp
 {
@@ -14,7 +13,8 @@ namespace ConsoleApp
 
         static Program()
         {
-            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            var assembly = typeof(ExecutionService).Assembly;
+            var version = assembly.GetName().Version;
             Header = $"MyCMD v{version.Major}.{version.Minor}.{version.Build}";
         }
 
@@ -66,7 +66,7 @@ namespace ConsoleApp
 
             executionService.AddCommands(new Command[]
             {
-                new ExitCommand(), new CleanScreenCommand(), new HelpCommand(), new CommandListCommand(),
+                new ExitCommand(), new CleanScreenCommand(), new HelpCommand(), new CommandListCommand(), new TestCommand(),
                 new SumCommand(), new SubCommand(), new MulCommand(), new DivCommand(),
                 new PowCommand(), new SqrtCommand()
             });

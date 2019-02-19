@@ -84,6 +84,8 @@ namespace Core.Commands
                 return ExecutionResult.Success(Interop.extractNumber(expr));
             else if (expr.IsCString)
                 return ExecutionResult.Success(Interop.extractString(expr));
+            else if (expr.IsCArray)
+                return ExecutionResult.Success("[" + string.Join(",", Interop.extractArray(expr)) + "]");
 
             return ExecutionResult.Error("cmd.error: can not execute the given expression");
 

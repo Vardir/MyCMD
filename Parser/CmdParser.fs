@@ -10,7 +10,7 @@ module CmdParser =
     //exit                                  --command without parameters/arguments                  +
     //help exit                             --command with one argument                             +
     //read -f "file.txt"                    --command with parameter with argument                  +
-    //copy "1.txt", "2.txt", "3.txt"        --list of vales                                         -
+    //copy ["1.txt", "2.txt", "3.txt"]      --array of vales                                        +
     //read -f "1.txt" | write -f "2.txt"    --pipeline                                              +
 
     //"text"    --string literal    +
@@ -27,7 +27,7 @@ module CmdParser =
         | CString    of string
         | CParameter of string
         | CArgument  of Expression
-        | CList      of Expression list
+        | CArray     of Expression[]
         | CQuery     of Expression list
         | CPipeline  of Expression list
         | CCommand   of string * Expression
@@ -171,13 +171,14 @@ module CmdParser =
         [ cNumber; cString; ]
         |> choice
 
-    let cList valueParser =
+    let cArray =
         let comma = pchar ',' .>> spaces
-        sepBy1 valueParser comma
+        pchar '[' >>. spaces >>. sepBy cLiteral comma .>> spaces .>> pchar ']'
+        |>> Array.ofList |>> CArray
         <?> "list"
 
     let cArgument = 
-        [ cNumber; cString; (*add list*) ]
+        [ cArray; cNumber; cString ]
         |> choice
         |>> CArgument
         <?> "argument"
@@ -207,7 +208,7 @@ module CmdParser =
         <?> "pipeline"
 
     let cExpr =
-        [ cPipeline; cCommand; cString; cNumber ] |> choice
+        [ cArray; cPipeline; cCommand; cString; cNumber ] |> choice
         |>> CExpr
         <?> "command"
 
