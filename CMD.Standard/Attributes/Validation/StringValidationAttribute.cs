@@ -2,11 +2,26 @@
 
 namespace Core.Attributes
 {
+    /// <summary>
+    /// An attribute to specify validation rules for a string parameter
+    /// </summary>
     public sealed class StringValidationAttribute : ParameterValidationAttribute
     {
+        /// <summary>
+        /// A flag to specify whether the parameter can contain null/empty string
+        /// </summary>
         public bool AllowNullOrEmpty { get; }
+        /// <summary>
+        /// Minimum length allowed for string
+        /// </summary>
         public int MinLength { get; }
+        /// <summary>
+        /// Maximum length allowed for string
+        /// </summary>
         public int MaxLength { get; }
+        /// <summary>
+        /// Regular expression pattern to validate a string
+        /// </summary>
         public string RegexPattern { get; }
 
         public StringValidationAttribute(int minLength, int maxLength)
@@ -20,6 +35,11 @@ namespace Core.Attributes
             RegexPattern = regexPattern;
         }
 
+        /// <summary>
+        /// Validates a value for attached parameter, returns null if no errors found
+        /// </summary>
+        /// <param name="value">A value to validate</param>
+        /// <returns></returns>
         public override string Validate(object value)
         {
             string str = value as string;

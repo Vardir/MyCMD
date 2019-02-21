@@ -8,6 +8,10 @@ namespace Core.Commands.Math
     {
         public DivCommand() : base("div") { }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute()
         {
             if (right == 0.0)

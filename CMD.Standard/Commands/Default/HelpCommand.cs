@@ -18,6 +18,10 @@ namespace Core.Commands
             builder = new StringBuilder();
         }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute()
         {            
             Command cmd = ExecutionService.FindCommand(id);
@@ -27,6 +31,11 @@ namespace Core.Commands
             return ExecutionResult.Success($"ID: {id}\nDescription: {cmd.Description}\nSyntax: {syntax}");
         }
 
+        /// <summary>
+        /// Builds the syntax of the given command
+        /// </summary>
+        /// <param name="cmd"></param>
+        /// <returns></returns>
         private string BuildSyntax(Command cmd)
         {
             builder.Clear();

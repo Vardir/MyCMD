@@ -8,6 +8,10 @@ namespace Core.Commands.Math
     {
         public PowCommand() : base("pow") { }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute() => ExecutionResult.Success(System.Math.Pow(left, right));
     }
 }

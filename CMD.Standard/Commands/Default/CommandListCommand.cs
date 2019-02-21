@@ -8,6 +8,10 @@ namespace Core.Commands
     {
         public CommandListCommand() : base("clist") { }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute()
         {
             var commands = ExecutionService.GetAllCommandsIDs();            

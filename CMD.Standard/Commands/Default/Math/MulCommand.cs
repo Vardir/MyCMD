@@ -8,6 +8,10 @@ namespace Core.Commands.Math
     {
         public MulCommand() : base("mul") { }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute() => ExecutionResult.Success(left * right);
     }
 }

@@ -2,12 +2,30 @@
 
 namespace Core.Attributes
 {
+    /// <summary>
+    /// An attribute to specify validation rules for an array parameter
+    /// </summary>
     public sealed class ArrayValidationAttribute : ParameterValidationAttribute
     {
+        /// <summary>
+        /// A flag to specify whether array can contain null values or not
+        /// </summary>
         public bool AllowNullValues { get; }
+        /// <summary>
+        /// A flag to specify whether parameter can contain null reference
+        /// </summary>
         public bool AllowArrayNullReference { get; }
+        /// <summary>
+        /// Minimum length of the array
+        /// </summary>
         public int MinLength { get; }
+        /// <summary>
+        /// Maximum length of the array
+        /// </summary>
         public int MaxLength { get; }
+        /// <summary>
+        /// Restricts type of values that can be contained in the array
+        /// </summary>
         public Type ValueType { get; }
 
         public ArrayValidationAttribute(bool allowArrayNullReference, bool allowNullValues)
@@ -33,6 +51,11 @@ namespace Core.Attributes
             ValueType = arrayValueType;
         }
 
+        /// <summary>
+        /// Validates a value for attached parameter, returns null if no errors found
+        /// </summary>
+        /// <param name="value">A value to validate</param>
+        /// <returns></returns>
         public override string Validate(object obj)
         {
             if (!AllowArrayNullReference && obj == null)

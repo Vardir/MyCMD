@@ -14,6 +14,10 @@ namespace Core.Commands.Math
 
         public SumManyCommand() : base("summ") { }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute()
         {
             double sum = 0;

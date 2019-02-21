@@ -7,6 +7,9 @@ using static ParserLib.CmdParser;
 
 namespace Core.Commands
 {
+    /// <summary>
+    /// An execution service that contains commands, executes commands on the string queries
+    /// </summary>
     public class ExecutionService
     {
         private readonly Dictionary<string, Command> commands;
@@ -17,6 +20,10 @@ namespace Core.Commands
             LoadCommands();
         }
 
+        /// <summary>
+        /// Adds and registrates the given command to internal storage
+        /// </summary>
+        /// <param name="cmd"></param>
         public void AddCommand(Command cmd)
         {
             if (cmd == null)
@@ -30,6 +37,10 @@ namespace Core.Commands
             commands.Add(cmd.Id, cmd);
             cmd.ExecutionService = this;
         }
+        /// <summary>
+        /// Adds and registrates a set of commands to internal storage
+        /// </summary>
+        /// <param name="commands"></param>
         public void AddCommands(IEnumerable<Command> commands)
         {
             if (commands == null)
@@ -39,12 +50,22 @@ namespace Core.Commands
                 AddCommand(cmd);
         }
 
+        /// <summary>
+        /// Searches for a command by the given ID, returns null if nothing found
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public Command FindCommand(string id)
         {
             if (commands.TryGetValue(id, out Command cmd))
                 return cmd;
             return null;
         }
+        /// <summary>
+        /// Reads the given line and tries to execute the query
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
         public ExecutionResult Execute(string line)
         {
             var result = Interop.runParser(line);
@@ -54,6 +75,10 @@ namespace Core.Commands
             else
                 return ExecutionResult.Error(result.message);
         }
+        /// <summary>
+        /// Gets IDs of all commands stored in service
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<string> GetAllCommandsIDs()
         {
             foreach (var kvp in commands)
@@ -62,6 +87,9 @@ namespace Core.Commands
             }
         }
 
+        /// <summary>
+        /// Loads and registrates commands from the current domain loaded assemblies
+        /// </summary>
         private void LoadCommands()
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -80,6 +108,11 @@ namespace Core.Commands
             }
         }
 
+        /// <summary>
+        /// Executes the given expression
+        /// </summary>
+        /// <param name="expr"></param>
+        /// <returns></returns>
         private ExecutionResult Execute(Expression expr)
         {
             if (expr.IsCCommand)
@@ -94,7 +127,7 @@ namespace Core.Commands
                 foreach (var cmd in cmds)
                 {
                     result = extractAndExecute(cmd.Item1, cmd.Item2, result);
-                    if (!result.isSuccessfull && !result.isEmpty)
+                    if (!result.isSuccessful && !result.isEmpty)
                     {
                         return ExecutionResult.Error($"{result.errorMessage}\ncmd.error: can not compute pipeline");
                     }

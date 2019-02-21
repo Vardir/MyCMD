@@ -71,7 +71,7 @@ namespace ConsoleApp
             {
                 //do nothing
             }
-            else if (executionResult.isSuccessfull)
+            else if (executionResult.isSuccessful)
             {
                 Type valueType = executionResult.result?.GetType();
                 if (valueType != null)

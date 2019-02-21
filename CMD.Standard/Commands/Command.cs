@@ -8,6 +8,9 @@ using System.Collections.Generic;
 
 namespace Core.Commands
 {
+    /// <summary>
+    /// A base class for executable command
+    /// </summary>
     public abstract class Command
     {
         private int _index;
@@ -17,8 +20,17 @@ namespace Core.Commands
         private readonly List<string> parametersOrder;
         private readonly Dictionary<string, Parameter> parameters;
 
+        /// <summary>
+        /// The ID of the command
+        /// </summary>
         public string Id { get; }
+        /// <summary>
+        /// The description of the command
+        /// </summary>
         public string Description { get; private set; }
+        /// <summary>
+        /// Parent execution service
+        /// </summary>
         public ExecutionService ExecutionService { get; set; }
 
         public Command(string id)
@@ -29,7 +41,18 @@ namespace Core.Commands
             Initialize();
         }
 
+        /// <summary>
+        /// Executes a command on the given expression
+        /// </summary>
+        /// <param name="expression">Expression to interpret</param>
+        /// <returns></returns>
         public ExecutionResult Execute(Expression expression) => Execute(expression, ExecutionResult.Empty());
+        /// <summary>
+        /// Executes a command on the given expression using previous execution result
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="pipedResult"></param>
+        /// <returns></returns>
         public ExecutionResult Execute(Expression expression, ExecutionResult pipedResult)
         {
             UnsetAllParameters();
@@ -38,8 +61,14 @@ namespace Core.Commands
                 if (pipelinedParameter == null)
                     return Error("command does not accept input from the pipeline");
                 Parameter parameter = parameters[pipelinedParameter];
-                if (!parameter.CanAssign(pipedResult.result))
-                    return Error($"pipelined value is of invalid type, expected: {parameter.GetValueType()} but got {pipedResult.result?.GetType()}");
+                if (parameter.Validation != null)
+                {
+                    string error = parameter.Validation.Validate(pipedResult.result);
+                    if (error != null)
+                        return Error($"parameter {parameter.Id} got invalid value: {error}");
+                }
+                else if (!parameter.CanAssign(pipedResult.result))
+                    return Error($"parameter {parameter.Id} accepts {parameter.GetValueType()} but got {pipedResult.result.GetType()}");
                 parameter.SetValue(pipedResult.result);
             }
             if (expression.IsCEmpty)
@@ -100,9 +129,22 @@ namespace Core.Commands
             throw new NotImplementedException();
         }
         
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected abstract ExecutionResult Execute();
         
+        /// <summary>
+        /// Shortcut to generate execution result based on command's ID
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         protected ExecutionResult Error(string message) => ExecutionResult.Error($"{Id}.error: {message}");
+        /// <summary>
+        /// Gets all the command parameters
+        /// </summary>
+        /// <returns></returns>
         protected internal Parameter[] GetParameters()
         {
             if (parametersArray != null)
@@ -124,6 +166,9 @@ namespace Core.Commands
             return parametersArray;
         }
 
+        /// <summary>
+        /// Initializes current instance of the command
+        /// </summary>
         private void Initialize()
         {
             Type type = GetType();
@@ -136,6 +181,10 @@ namespace Core.Commands
             if (descriptionAttr != null)
                 Description = descriptionAttr.Value;
         }
+        /// <summary>
+        /// Reads all the attributes of each field to identify and registrate command parameters
+        /// </summary>
+        /// <param name="field"></param>
         private void ReadFieldAttributes(FieldInfo field)
         {
             bool isOptional = false;
@@ -184,6 +233,9 @@ namespace Core.Commands
             if (!isFlag)
                 parametersOrder.Add(id);
         }
+        /// <summary>
+        /// Clears out values stored in parameters
+        /// </summary>
         private void UnsetAllParameters()
         {
             foreach (var kvp in parameters)
@@ -192,6 +244,12 @@ namespace Core.Commands
             }
         }
        
+        /// <summary>
+        /// Stores the given value in the given parameter
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         private string SetParameter(Parameter parameter, object value)
         {
             if (parameter.IsSet)
@@ -207,10 +265,16 @@ namespace Core.Commands
             parameter.SetValue(value);
             return null;
         }
+        /// <summary>
+        /// Pushes the given parameter based on the previous one
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="previous"></param>
+        /// <returns></returns>
         private (Parameter, string) PushParameter(string id, Parameter previous)
         {
             if (!parameters.TryGetValue(id, out Parameter parameter))
-                return (null, $"command does not accept parameter {id}");
+                return (null, $"command '{id}' does not accept parameter");
 
             if (previous != null)
             {
@@ -220,7 +284,7 @@ namespace Core.Commands
                     _index++;
                 }
                 else
-                    return (null, $"parameter {previous.Id} accepts value but got nothing");
+                    return (null, $"parameter '{previous.Id}' accepts value but got nothing");
             }
             return (parameter, null);
         }        

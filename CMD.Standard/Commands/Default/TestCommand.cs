@@ -29,6 +29,10 @@ namespace Core.Commands
 
         public TestCommand() : base("test") { }
 
+        /// <summary>
+        /// Execution routine of the command
+        /// </summary>
+        /// <returns></returns>
         protected override ExecutionResult Execute()
         {
             if (bParam)

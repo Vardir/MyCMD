@@ -2,6 +2,9 @@
 
 namespace Core.Commands.Math
 {
+    /// <summary>
+    /// A base class for math commands with one double-precision numeric parameter
+    /// </summary>
     public abstract class MathOneArgumentCommand : Command
     {
         [Pipeline]

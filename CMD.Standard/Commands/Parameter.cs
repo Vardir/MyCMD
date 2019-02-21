@@ -4,17 +4,41 @@ using System.Reflection;
 
 namespace Core.Commands
 {
+    /// <summary>
+    /// A generalized class to represent a command parameter
+    /// </summary>
     public class Parameter
     {
         private readonly Command container;
         private readonly FieldInfo backingField;
 
+        /// <summary>
+        /// Indicates that parameter is flag
+        /// </summary>
         public bool IsFlag { get; }
+        /// <summary>
+        /// Indicates that parameter is optional and can be omitted while command is executed
+        /// </summary>
         public bool IsOptional { get; }
+        /// <summary>
+        /// Indicates that parameter value is set
+        /// </summary>
         public bool IsSet { get; private set; }
+        /// <summary>
+        /// A default value for the parameter
+        /// </summary>
         public object DefaultValue { get; }
+        /// <summary>
+        /// The ID of the parameter
+        /// </summary>
         public string Id { get; }
+        /// <summary>
+        /// The description of the parameter
+        /// </summary>
         public string Description { get; }
+        /// <summary>
+        /// A validation that verifies value before setting parameter
+        /// </summary>
         public IParameterValidation Validation { get; }
 
         private Parameter(string id, string description, bool isOptional, IParameterValidation validation)
@@ -50,6 +74,9 @@ namespace Core.Commands
             this.backingField = backingField;
         }
 
+        /// <summary>
+        /// Clears out value from the parameter
+        /// </summary>
         public void Unset()
         {
             IsSet = false;
@@ -58,6 +85,9 @@ namespace Core.Commands
             else if (IsOptional)
                 backingField.SetValue(container, DefaultValue);
         }
+        /// <summary>
+        /// Sets a default value to parameter if parameter is optional/flag
+        /// </summary>
         public void Set()
         {
             if (!IsOptional && !IsFlag)
@@ -68,6 +98,10 @@ namespace Core.Commands
             else
                 backingField.SetValue(container, DefaultValue);
         }
+        /// <summary>
+        /// Stores the given value to the parameter
+        /// </summary>
+        /// <param name="value"></param>
         public void SetValue(object value)
         {
             if (IsFlag)
@@ -76,7 +110,16 @@ namespace Core.Commands
             backingField.SetValue(container, value);
         }
 
+        /// <summary>
+        /// Verifies if the given value can be stored in the parameter
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool CanAssign(object value) => backingField.FieldType == value.GetType();
+        /// <summary>
+        /// Gets type of the internal storage of the parameter
+        /// </summary>
+        /// <returns></returns>
         public Type GetValueType() => backingField.FieldType;
     }
 }
