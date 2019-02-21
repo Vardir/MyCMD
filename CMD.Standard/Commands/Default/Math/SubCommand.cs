@@ -2,12 +2,12 @@
 
 namespace Core.Commands.Math
 {
+    [AutoRegistrate]
     [Description("Subtract the given arguments if they are numbers.")]
     public class SubCommand : MathTwoArgumentsCommand
     {
-        public SubCommand() : base("sub")
-        { }
+        public SubCommand() : base("sub") { }
 
-        protected override (string, double) Calculate(double left, double right) => (null, left - right);
+        protected override ExecutionResult Execute() => ExecutionResult.Success(left - right);
     }
 }

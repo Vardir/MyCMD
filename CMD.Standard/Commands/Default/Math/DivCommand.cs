@@ -2,18 +2,18 @@
 
 namespace Core.Commands.Math
 {
-    [Description("Divides the given arguments if they are numbers.")]
+    [AutoRegistrate]
+    [Description("Divides the given numeric arguments.")]
     public class DivCommand : MathTwoArgumentsCommand
     {
-        public DivCommand() : base("div")
-        { }
+        public DivCommand() : base("div") { }
 
-        protected override (string, double) Calculate(double left, double right)
+        protected override ExecutionResult Execute()
         {
             if (right == 0.0)
-                return ("div.error: zero-division exception", 0.0);
+                return Error("zero-division exception");
 
-            return (null, left / right);
+            return ExecutionResult.Success(left / right);
         }
     }
 }

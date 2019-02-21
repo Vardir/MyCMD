@@ -3,6 +3,7 @@ using Core.Attributes;
 
 namespace ConsoleApp.Commands
 {
+    [AutoRegistrate]
     [Description("Cleans off the console. Requires no parameters.")]
     public class CleanScreenCommand : Command
     {

@@ -2,24 +2,13 @@
 
 namespace Core.Commands.Math
 {
-    public abstract class MathOneArgumentCommand : MathCommand
+    public abstract class MathOneArgumentCommand : Command
     {
         [Pipeline]
-        [NumberParameter(Key = "o")]
-        [Description("Operand of the command")]
+        [NumberParameter]
+        [Description("The operand to calculate on")]
         protected double operand;
 
-        public MathOneArgumentCommand(string id) : base(id)
-        { }
-
-        protected override ExecutionResult Execute()
-        {
-            var (error, result) = Calculate(operand);
-            if (!string.IsNullOrEmpty(error))
-                return ExecutionResult.Error(error);
-            return ExecutionResult.Success(result);
-        }
-
-        protected abstract (string, double) Calculate(double operand);
+        public MathOneArgumentCommand(string id) : base(id) { }
     }
 }

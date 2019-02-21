@@ -2,12 +2,12 @@
 
 namespace Core.Commands.Math
 {
+    [AutoRegistrate]
     [Description("Returns a specified number raised the specified power.")]
     public class PowCommand : MathTwoArgumentsCommand
     {
-        public PowCommand() : base("pow")
-        { }
+        public PowCommand() : base("pow") { }
 
-        protected override (string, double) Calculate(double left, double right) => (null, System.Math.Pow(left, right));
+        protected override ExecutionResult Execute() => ExecutionResult.Success(System.Math.Pow(left, right));
     }
 }

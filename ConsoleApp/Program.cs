@@ -1,7 +1,5 @@
 ﻿using System;
 using Core.Commands;
-using Core.Commands.Math;
-using ConsoleApp.Commands;
 
 namespace ConsoleApp
 {
@@ -64,13 +62,6 @@ namespace ConsoleApp
         {
             executionService = new ExecutionService();
 
-            executionService.AddCommands(new Command[]
-            {
-                new ExitCommand(), new CleanScreenCommand(), new HelpCommand(), new CommandListCommand(), new TestCommand(),
-                new SumCommand(), new SubCommand(), new MulCommand(), new DivCommand(),
-                new PowCommand(), new SqrtCommand()
-            });
-
             //activate parser
             executionService.Execute("");
         }
@@ -81,7 +72,18 @@ namespace ConsoleApp
                 //do nothing
             }
             else if (executionResult.isSuccessfull)
+            {
+                Type valueType = executionResult.result?.GetType();
+                if (valueType != null)
+                {
+                    if (valueType.IsArray)
+                    {
+                        Print("[" + string.Join(", ", executionResult.result as object[]) + "]");
+                        return;
+                    }
+                }
                 Print(executionResult.result?.ToString());
+            }
             else
                 Print(executionResult.errorMessage, Message.Error);
         }

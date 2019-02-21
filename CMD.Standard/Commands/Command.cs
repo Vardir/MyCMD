@@ -132,60 +132,54 @@ namespace Core.Commands
             {
                 ReadFieldAttributes(fields[f]);
             }
-            Attribute[] attributes = Attribute.GetCustomAttributes(type);
-            for (int a = 0; a < attributes.Length; a++)
-            {
-                Attribute attribute = attributes[a];
-                if (attribute is DescriptionAttribute descriptionAttr)
-                {
-                    Description = descriptionAttr.Value;
-                }
-            }
+            var descriptionAttr = type.GetCustomAttribute<DescriptionAttribute>();
+            if (descriptionAttr != null)
+                Description = descriptionAttr.Value;
         }
         private void ReadFieldAttributes(FieldInfo field)
         {
-            bool isCommandParameter = false;
             bool isOptional = false;
             bool isPipelined = false;
             bool isFlag = false;
             object defaultValue = null;
-            string id = field.Name.ToLower();
+            string id = field.Name.Replace("Param", "").ToLower();
             string description = $"Parameter {id}";
+            IParameterValidation validation = null;
 
-            Attribute[] attributes = Attribute.GetCustomAttributes(field);
-            for (int a = 0; a < attributes.Length; a++)
+            var parameterAttr = field.GetCustomAttribute<ParameterAttribute>();
+            if (parameterAttr != null)
             {
-                Attribute attribute = attributes[a];
-                if (attribute is DescriptionAttribute descriptionAttr)
-                    description = descriptionAttr.Value;
-                else if (attribute is ParameterAttribute parameterAttr)
-                {
-                    if (!parameterAttr.IsAllowedType(field.FieldType))
-                        throw new InvalidOperationException("the attribute attached to the field has an invalid type");
-                    if (parameterAttr.IsOptional)
-                        defaultValue = parameterAttr.GetDefaultValue();
-                    if (parameterAttr is FlagAttribute)
-                        isFlag = true;
-                    id = parameterAttr.Key ?? id;
-                    isOptional = parameterAttr.IsOptional;
-                    isCommandParameter = true;
-                }
-                else if (attribute is PipelineAttribute)
-                {
-                    if (pipelinedParameter != null)
-                        throw new InvalidOperationException("the pipeline attribute must be attached only once per class");
-                    isPipelined = true;
-                }
+                if (!parameterAttr.IsAllowedType(field.FieldType))
+                    throw new InvalidOperationException("the attribute attached to the field has an invalid type");
+                if (parameterAttr.IsOptional)
+                    defaultValue = parameterAttr.GetDefaultValue();
+                if (parameterAttr is FlagAttribute)
+                    isFlag = true;
+                id = parameterAttr.Key ?? id;
+                isOptional = parameterAttr.IsOptional;
             }
-            if (!isCommandParameter)
-                return;
+            else return;
+
+            var descriptionAttr = field.GetCustomAttribute<DescriptionAttribute>();
+            if (descriptionAttr != null)
+                description = descriptionAttr.Value;            
+            var validationAttribute = field.GetCustomAttribute<ParameterValidationAttribute>();
+            if (validationAttribute != null)
+                validation = validationAttribute;
+            if (field.GetCustomAttribute<PipelineAttribute>() != null)
+            {
+                if (pipelinedParameter != null)
+                    throw new InvalidOperationException("the pipeline attribute must be attached only once per class");
+                isPipelined = true;
+            }
+
             if (isPipelined)
                 pipelinedParameter = id;
             Parameter commandParameter;
             if (isOptional && !isFlag)
-                commandParameter = new Parameter(id, description, defaultValue, this, field);
+                commandParameter = new Parameter(id, description, defaultValue, this, field, validation);
             else
-                commandParameter = new Parameter(id, description, isFlag, this, field);
+                commandParameter = new Parameter(id, description, isFlag, this, field, validation);
             parameters.Add(id, commandParameter);
             if (!isFlag)
                 parametersOrder.Add(id);
@@ -202,7 +196,13 @@ namespace Core.Commands
         {
             if (parameter.IsSet)
                 return $"parameter {parameter.Id} is already assigned";
-            if (!parameter.CanAssign(value))
+            if (parameter.Validation != null)
+            {
+                string error = parameter.Validation.Validate(value);
+                if (error != null)
+                    return $"parameter {parameter.Id} got invalid value: {error}";
+            }
+            else if (!parameter.CanAssign(value))
                 return $"parameter {parameter.Id} accepts {parameter.GetValueType()} but got {value.GetType()}";
             parameter.SetValue(value);
             return null;

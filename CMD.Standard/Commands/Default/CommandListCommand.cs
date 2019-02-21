@@ -2,11 +2,11 @@
 
 namespace Core.Commands
 {
+    [AutoRegistrate]
     [Description("Prints out all available commands.")]
     public class CommandListCommand : Command
     {
-        public CommandListCommand() : base("clist")
-        { }
+        public CommandListCommand() : base("clist") { }
 
         protected override ExecutionResult Execute()
         {

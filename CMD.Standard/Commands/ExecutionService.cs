@@ -1,5 +1,7 @@
 ﻿using System;
 using ParserLib;
+using Core.Attributes;
+using System.Reflection;
 using System.Collections.Generic;
 using static ParserLib.CmdParser;
 
@@ -12,6 +14,7 @@ namespace Core.Commands
         public ExecutionService()
         {
             commands = new Dictionary<string, Command>();
+            LoadCommands();
         }
 
         public void AddCommand(Command cmd)
@@ -59,6 +62,24 @@ namespace Core.Commands
             }
         }
 
+        private void LoadCommands()
+        {
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            for (int i = 0; i < assemblies.Length; i++)
+            {
+                if (assemblies[i].GetCustomAttribute<ContainsCommandsAttribute>() == null)
+                    continue;
+                Type[] types = assemblies[i].GetTypes();
+                for (int j = 0; j < types.Length; j++)
+                {
+                    var attr = types[j].GetCustomAttribute<AutoRegistrateAttribute>();
+                    if (attr == null)
+                        continue;
+                    AddCommand(Activator.CreateInstance(types[j]) as Command);
+                }
+            }
+        }
+
         private ExecutionResult Execute(Expression expr)
         {
             if (expr.IsCCommand)
@@ -85,7 +106,7 @@ namespace Core.Commands
             else if (expr.IsCString)
                 return ExecutionResult.Success(Interop.extractString(expr));
             else if (expr.IsCArray)
-                return ExecutionResult.Success("[" + string.Join(",", Interop.extractArray(expr)) + "]");
+                return ExecutionResult.Success(Interop.extractArray(expr));
 
             return ExecutionResult.Error("cmd.error: can not execute the given expression");
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Attributes;
 using System.Reflection;
 
 namespace Core.Commands
@@ -14,27 +15,37 @@ namespace Core.Commands
         public object DefaultValue { get; }
         public string Id { get; }
         public string Description { get; }
+        public IParameterValidation Validation { get; }
 
-        private Parameter(string id, string description, bool isOptional)
+        private Parameter(string id, string description, bool isOptional, IParameterValidation validation)
         {
             Id = id;
             IsOptional = isOptional;
             Description = description;
+            Validation = validation;
         }
         
-        public Parameter(string id, string description, bool isFlag, Command container, FieldInfo backingField)
-            : this(id, description, false)
+        public Parameter(string id, string description, bool isFlag, 
+                         Command container, FieldInfo backingField, IParameterValidation validation)
+            : this(id, description, false, validation)
         {
             IsOptional = isFlag;
             IsFlag = isFlag;
             this.container = container;
             this.backingField = backingField;
         }
-        public Parameter(string id, string description, object defaultValue, Command container, FieldInfo backingField)
-            : this(id, description, true)
+        public Parameter(string id, string description, object defaultValue, 
+                         Command container, FieldInfo backingField, IParameterValidation validation)
+            : this(id, description, true, validation)
         {
             IsOptional = true;
             this.container = container;
+            if (validation != null)
+            {
+                string error = validation.Validate(defaultValue);
+                if (error != null)
+                    throw new ArgumentException(error, nameof(defaultValue));
+            }
             DefaultValue = defaultValue;
             this.backingField = backingField;
         }

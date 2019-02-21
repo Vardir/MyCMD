@@ -2,12 +2,12 @@
 
 namespace Core.Commands.Math
 {
+    [AutoRegistrate]
     [Description("Returns the square root of the specified number.")]
     public class SqrtCommand : MathOneArgumentCommand
     {
-        public SqrtCommand() : base("sqrt")
-        { }
+        public SqrtCommand() : base("sqrt") { }
 
-        protected override (string, double) Calculate(double operand) => (null, System.Math.Sqrt(operand));
+        protected override ExecutionResult Execute() => ExecutionResult.Success(System.Math.Sqrt(operand));
     }
 }

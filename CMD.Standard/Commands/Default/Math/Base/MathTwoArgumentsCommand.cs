@@ -2,28 +2,17 @@
 
 namespace Core.Commands.Math
 {
-    public abstract class MathTwoArgumentsCommand : MathCommand
+    public abstract class MathTwoArgumentsCommand : Command
     {
         [Pipeline]
-        [NumberParameter(Key = "l")]
-        [Description("Left operand of the command")]
-        protected double leftOperand;
-        
-        [NumberParameter(Key = "r")]
-        [Description("Right operand of the command")]
-        protected double rightOperand;
+        [NumberParameter]
+        [Description("The left-side parameter")]
+        protected double left;
 
-        public MathTwoArgumentsCommand(string id) : base(id)
-        { }
+        [NumberParameter]
+        [Description("The right-side parameter")]
+        protected double right;
 
-        protected override ExecutionResult Execute()
-        {
-            var (error, result) = Calculate(leftOperand, rightOperand);
-            if (!string.IsNullOrEmpty(error))
-                return ExecutionResult.Error(error);
-            return ExecutionResult.Success(result);
-        }
-
-        protected abstract (string, double) Calculate(double left, double right);        
+        public MathTwoArgumentsCommand(string id) : base(id) { }
     }
 }

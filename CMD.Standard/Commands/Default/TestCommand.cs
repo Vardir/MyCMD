@@ -1,36 +1,39 @@
-﻿using System;
-using Core.Attributes;
+﻿using Core.Attributes;
 
 namespace Core.Commands
 {
     [Description("A test command")]
     public class TestCommand : Command
     {
-        [Flag(Key = "b")]
+        [Flag(Key = "flag")]
         [Description("A test flag parameter")]
         protected bool bParam;
 
         [Pipeline]
-        [StringParameter(Key = "s", IsOptional = true)]
+        [StringParameter(IsOptional = true)]
         [Description("A test string parameter")]
         protected string sParam;
 
-        [NumberParameter(Key = "d")]
+        [NumberParameter]
         [Description("A test double parameter")]
         protected double dParam;
 
-        [ArrayParameter(Key = "a")]
+        [ArrayParameter]
+        [ArrayValidation(2, 5, false, false, typeof(int))]
         [Description("A test array parameter")]
         protected object[] aParam;
 
-        public TestCommand() : base("test")
-        {
+        [ObjectParameter]
+        [Description("A test object parameter")]
+        protected object oParam;
 
-        }
+        public TestCommand() : base("test") { }
 
         protected override ExecutionResult Execute()
         {
-            throw new NotImplementedException();
+            if (bParam)
+                return ExecutionResult.Success(null);
+            return Error("flag is not set");
         }
     }
 }

@@ -3,10 +3,11 @@ using Core.Attributes;
 
 namespace Core.Commands
 {
+    [AutoRegistrate]
     [Description("Prints out the information about the given command.")]
     public class HelpCommand : Command
     {
-        [StringParameter(Key="id")]
+        [StringParameter]
         [Description("ID of the command")]
         protected string id;
 
