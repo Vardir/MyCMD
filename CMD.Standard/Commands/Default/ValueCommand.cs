@@ -7,7 +7,7 @@ namespace Core.Commands
     public class ValueCommand : Command
     {
         [ObjectParameter]
-        [ObjectValidation(true)]
+        [ObjectValidation(AllowNulls = true)]
         [Description("A parameter that accepts values of any type")]
         protected object input;
 

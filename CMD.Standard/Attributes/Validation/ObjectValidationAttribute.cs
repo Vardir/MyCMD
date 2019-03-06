@@ -1,4 +1,6 @@
-﻿namespace Core.Attributes
+﻿using System;
+
+namespace Core.Attributes
 {
     /// <summary>
     /// An attribute to specify validation rules for an object parameter
@@ -6,13 +8,23 @@
     public sealed class ObjectValidationAttribute : ParameterValidationAttribute
     {
         /// <summary>
-        /// A flag to specify whether the parameter can contain null value
+        /// A flag to specify whether the parameter can contain null value (default: true)
         /// </summary>
-        public bool AllowNulls { get; }
+        public bool AllowNulls { get; set; }
+        /// <summary>
+        /// A restriction of value type allowed for the parameter
+        /// </summary>
+        public Type TypeRestriction { get; }
 
-        public ObjectValidationAttribute(bool allowNulls)
+        public ObjectValidationAttribute()
         {
-            AllowNulls = allowNulls;
+            AllowNulls = true;
+            TypeRestriction = null;
+        }
+        public ObjectValidationAttribute(Type restriction)
+        {
+            AllowNulls = true;
+            TypeRestriction = restriction;
         }
 
         /// <summary>
@@ -24,6 +36,8 @@
         {
             if (value == null && !AllowNulls)
                 return "null values are not allowed";
+            if (TypeRestriction != null && value.GetType() != TypeRestriction)
+                return "object was of invalid type";
             return null;
         }
     }

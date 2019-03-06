@@ -8,31 +8,28 @@ namespace Core.Attributes
     public sealed class StringValidationAttribute : ParameterValidationAttribute
     {
         /// <summary>
-        /// A flag to specify whether the parameter can contain null/empty string
+        /// A flag to specify whether the parameter can contain null/empty string (default: true)
         /// </summary>
-        public bool AllowNullOrEmpty { get; }
+        public bool AllowNullOrEmpty { get; set; }
         /// <summary>
-        /// Minimum length allowed for string
+        /// Minimum length allowed for string (default: 0)
         /// </summary>
-        public int MinLength { get; }
+        public int MinLength { get; set; }
         /// <summary>
-        /// Maximum length allowed for string
+        /// Maximum length allowed for string (default: 2 147 483 647)
         /// </summary>
-        public int MaxLength { get; }
+        public int MaxLength { get; set; }
         /// <summary>
-        /// Regular expression pattern to validate a string
+        /// Regular expression pattern to validate a string (default: null)
         /// </summary>
-        public string RegexPattern { get; }
+        public string RegexPattern { get; set; }
 
-        public StringValidationAttribute(int minLength, int maxLength)
+        public StringValidationAttribute()
         {
-            MinLength = minLength;
-            MaxLength = maxLength;
-        }
-        public StringValidationAttribute(int minLength, int maxLength, string regexPattern)
-            : this(minLength, maxLength)
-        {
-            RegexPattern = regexPattern;
+            AllowNullOrEmpty = true;
+            MinLength = 0;
+            MaxLength = int.MaxValue;
+            RegexPattern = null;
         }
 
         /// <summary>

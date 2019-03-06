@@ -8,14 +8,19 @@ namespace Core.Attributes
     public sealed class NumberValidationAttribute : ParameterValidationAttribute
     {
         /// <summary>
-        /// Minimum value allowed for parameter
+        /// Minimum value allowed for parameter (default: ±5,0 × 10E−324)
         /// </summary>
-        public double MinValue { get; }
+        public double MinValue { get; set; }
         /// <summary>
-        /// Maximum value allowed for parameter
+        /// Maximum value allowed for parameter (default: ±1,7 × 10E308)
         /// </summary>
-        public double MaxValue { get; }
+        public double MaxValue { get; set; }
 
+        public NumberValidationAttribute()
+        {
+            MinValue = double.MinValue;
+            MaxValue = double.MaxValue;
+        }
         public NumberValidationAttribute(double minValue, double maxValue)
         {
             MinValue = minValue;

@@ -8,47 +8,33 @@ namespace Core.Attributes
     public sealed class ArrayValidationAttribute : ParameterValidationAttribute
     {
         /// <summary>
-        /// A flag to specify whether array can contain null values or not
+        /// A flag to specify whether array can contain null values or not (default: true)
         /// </summary>
-        public bool AllowNullValues { get; }
+        public bool AllowNullValues { get; set; }
         /// <summary>
-        /// A flag to specify whether parameter can contain null reference
+        /// A flag to specify whether parameter can contain null reference (default: false)
         /// </summary>
-        public bool AllowArrayNullReference { get; }
+        public bool AllowArrayNullReference { get; set; }
         /// <summary>
-        /// Minimum length of the array
+        /// Minimum length of the array (default: 0)
         /// </summary>
-        public int MinLength { get; }
+        public int MinLength { get; set; }
         /// <summary>
-        /// Maximum length of the array
+        /// Maximum length of the array (default: 2 147 483 647)
         /// </summary>
-        public int MaxLength { get; }
+        public int MaxLength { get; set; }
         /// <summary>
-        /// Restricts type of values that can be contained in the array
+        /// Restricts type of values that can be contained in the array (default: null)
         /// </summary>
-        public Type ValueType { get; }
+        public Type ValueType { get; set; }
 
-        public ArrayValidationAttribute(bool allowArrayNullReference, bool allowNullValues)
+        public ArrayValidationAttribute()
         {
             MinLength = 0;
             MaxLength = int.MaxValue;
-            AllowNullValues = allowNullValues;
-            AllowArrayNullReference = allowArrayNullReference;
-        }
-        public ArrayValidationAttribute(int minLength, int maxLength, bool allowArrayNullReference, bool allowNullValues)
-            : this(allowArrayNullReference, allowNullValues)
-        {
-            if (minLength < 0)
-                throw new ArgumentException("Minimum value can not be less than 0");
-            if (minLength > maxLength)
-                throw new ArgumentException("Minimum value can not be greater than maximum");
-            MinLength = minLength;
-            MaxLength = maxLength;
-        }
-        public ArrayValidationAttribute(int minLength, int maxLength, bool allowArrayNullReference, bool allowNullValues, Type arrayValueType)
-            : this(minLength, maxLength, allowArrayNullReference, allowNullValues)
-        {
-            ValueType = arrayValueType;
+            ValueType = null;
+            AllowNullValues = true;
+            AllowArrayNullReference = false;
         }
 
         /// <summary>

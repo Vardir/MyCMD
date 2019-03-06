@@ -98,7 +98,7 @@ namespace Core.Commands
                         if (_index >= parametersOrder.Count)
                             return Error("too many parameters given");
                         Parameter parameter = previousParameter ?? parameters[parametersOrder[_index]];
-                        if (parameter.IsSet && parameter.Id == pipelinedParameter && previousParameter == null)
+                        if (parameter.IsSet && parameter.IsPipelined && previousParameter == null)
                         {
                             if (++_index >= parametersOrder.Count)
                                 return Error("too many parameters given");
@@ -221,14 +221,17 @@ namespace Core.Commands
                     throw new InvalidOperationException("the pipeline attribute must be attached only once per class");
                 isPipelined = true;
             }
-
-            if (isPipelined)
-                pipelinedParameter = id;
+            
             Parameter commandParameter;
             if (isOptional && !isFlag)
                 commandParameter = new Parameter(id, description, defaultValue, this, field, validation);
             else
                 commandParameter = new Parameter(id, description, isFlag, this, field, validation);
+            if (isPipelined)
+            {
+                pipelinedParameter = id;
+                commandParameter.IsPipelined = true;
+            }
             parameters.Add(id, commandParameter);
             if (!isFlag)
                 parametersOrder.Add(id);

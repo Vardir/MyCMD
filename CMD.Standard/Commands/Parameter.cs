@@ -25,6 +25,10 @@ namespace Core.Commands
         /// </summary>
         public bool IsSet { get; private set; }
         /// <summary>
+        /// Indicates that parameter receives pipelined value
+        /// </summary>
+        public bool IsPipelined { get; internal set; }
+        /// <summary>
         /// A default value for the parameter
         /// </summary>
         public object DefaultValue { get; }

@@ -8,8 +8,7 @@ namespace Core.Commands.Math
     {
         [Pipeline]
         [ArrayParameter]
-        [ArrayValidation(minLength: 1, maxLength: int.MaxValue, allowArrayNullReference: false, 
-                         allowNullValues: false, arrayValueType: typeof(double))]
+        [ArrayValidation(MinLength = 1, ValueType = typeof(double))]
         protected object[] inputs;
 
         public SumManyCommand() : base("summ") { }

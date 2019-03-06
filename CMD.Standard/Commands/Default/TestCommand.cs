@@ -19,7 +19,7 @@ namespace Core.Commands
         protected double dParam;
 
         [ArrayParameter]
-        [ArrayValidation(2, 5, false, false, typeof(int))]
+        [ArrayValidation(MinLength = 2, MaxLength = 5, ValueType = typeof(int))]
         [Description("A test array parameter")]
         protected object[] aParam;
 

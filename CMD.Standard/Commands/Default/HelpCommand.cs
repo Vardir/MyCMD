@@ -44,7 +44,7 @@ namespace Core.Commands
             Parameter[] array = cmd.GetParameters();
             for (int p = 0; p < array.Length; p++)
             {
-                Parameter parameter = array[p];
+                Parameter parameter = array[p];                
                 if (parameter.IsFlag)
                 {
                     builder.Append('[');
@@ -79,7 +79,7 @@ namespace Core.Commands
                 for (int p = 0; p < array.Length; p++)
                 {
                     Parameter parameter = array[p];
-                    builder.Append($"\n\t-{parameter.Id} -- {parameter.Description}");
+                    builder.Append($"\n\t-{parameter.Id} -- {(parameter.IsPipelined ? "(pipelined)" : null)} {parameter.Description}");
                 }
             }
             return builder.ToString();
