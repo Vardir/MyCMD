@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>Vardirsoft.MyCmd.Core</RootNamespace>    
+    <PackageId>Vardirsoft.MyCMD.Core</PackageId>
+    <Authors>Vardir</Authors>
+    <Company>Vardirsoft</Company>
+    <Product>MyCMD Core</Product>
+    <AssemblyName>mcmd.core</AssemblyName>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\MyCMD.Parser\MyCMD.Parser.fsproj" />
+  </ItemGroup>
+</Project>
