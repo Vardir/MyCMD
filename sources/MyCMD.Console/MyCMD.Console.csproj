@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,6 +8,12 @@
     <Company>Vardirsoft</Company>
     <Product>MyCMD Console</Product>
     <AssemblyName>mcmd.console</AssemblyName>
+    
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <Version>2.0.0</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
