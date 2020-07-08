@@ -1,10 +1,10 @@
 ﻿using Vardirsoft.MyCmd.Core.Attributes;
-using Vardirsoft.MyCmd.Core.Attributes.Paramater;
+using Vardirsoft.MyCmd.Core.Attributes.Parameters;
 using Vardirsoft.MyCmd.Core.Attributes.Validation;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default
 {
-    [AutoRegistrate]
+    [AutoRegister]
     [Description("Accepts any value as input and returns the value as is")]
     public class ValueCommand : Command
     {

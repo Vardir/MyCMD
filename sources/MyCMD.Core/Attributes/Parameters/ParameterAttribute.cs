@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Vardirsoft.MyCmd.Core.Attributes.Paramater
+namespace Vardirsoft.MyCmd.Core.Attributes.Parameters
 {
     /// <summary>
     /// An attribute to mark field as parameter of a command
     /// </summary>
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Field)]
     public abstract class ParameterAttribute : Attribute
     {
         /// <summary>
@@ -16,11 +16,6 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Paramater
         /// The ID of the parameter used to find it
         /// </summary>
         public string Key { get; set; }
-
-        public ParameterAttribute()
-        {
-            
-        }
 
         /// <summary>
         /// Verifies if the given type is valid to set parameter's value

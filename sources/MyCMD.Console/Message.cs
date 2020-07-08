@@ -2,6 +2,9 @@
 {
     internal enum Message
     {
-        Default, Error, Info, Placeholder
+        Default, 
+        Error, 
+        Info, 
+        Placeholder
     }
 }

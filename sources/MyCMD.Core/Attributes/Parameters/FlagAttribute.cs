@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Vardirsoft.MyCmd.Core.Attributes.Paramater
+namespace Vardirsoft.MyCmd.Core.Attributes.Parameters
 {
     /// <summary>
     /// An attribute to mark field as flag for a command

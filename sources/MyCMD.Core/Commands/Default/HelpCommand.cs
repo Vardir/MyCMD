@@ -1,10 +1,11 @@
 ﻿using System.Text;
+
 using Vardirsoft.MyCmd.Core.Attributes;
-using Vardirsoft.MyCmd.Core.Attributes.Paramater;
+using Vardirsoft.MyCmd.Core.Attributes.Parameters;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default
 {
-    [AutoRegistrate]
+    [AutoRegister]
     [Description("Prints out the information about the given command.")]
     public class HelpCommand : Command
     {
@@ -25,11 +26,12 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default
         /// <returns></returns>
         protected override ExecutionResult Execute()
         {            
-            Command cmd = ExecutionService.FindCommand(id);
+            var cmd = ExecutionService.FindCommand(id);
+            
             if (cmd == null)
                 return ExecutionResult.Error($"can not find command with ID '{id}'");
-            string syntax = BuildSyntax(cmd);
-            return ExecutionResult.Success($"ID: {id}\nDescription: {cmd.Description}\nSyntax: {syntax}");
+            
+            return ExecutionResult.Success($"ID: {id}\nDescription: {cmd.Description}\nSyntax: {BuildSyntax(cmd)}");
         }
 
         /// <summary>
@@ -42,48 +44,65 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default
             builder.Clear();
             builder.Append(cmd.Id);
             builder.Append(' ');
-            Parameter[] array = cmd.GetParameters();
-            for (int p = 0; p < array.Length; p++)
+            
+            var array = cmd.GetParameters();
+            foreach (var parameter in array)
             {
-                Parameter parameter = array[p];                
                 if (parameter.IsFlag)
                 {
-                    builder.Append('[');
-                    builder.Append('-');
-                    builder.Append(parameter.Id);
-                    builder.Append(']');
-                    builder.Append(' ');
+                   WriteParameterAsFlag(builder, parameter.Id);
                 }
                 else if (parameter.IsOptional)
                 {
-                    builder.Append('[');
-                    builder.Append('-');
-                    builder.Append(parameter.Id);
-                    builder.Append(' ');
-                    builder.Append("<arg>");
-                    builder.Append(']');
-                    builder.Append(' ');
+                    WriteParameterAsOptional(builder, parameter.Id);
                 }
                 else
                 {
-                    builder.Append('-');
-                    builder.Append(parameter.Id);
-                    builder.Append(' ');
-                    builder.Append("<arg>");
-                    builder.Append(' ');
+                    WriteParameter(builder, parameter.Id);
                 }
             }
-            if (array.Length > 0)
+
+            if (array.Length == 0) 
+                return builder.ToString();
+
+            builder.Append('\n');
+            builder.Append("where:");
+
+            foreach (var parameter in array)
             {
-                builder.Append('\n');
-                builder.Append("where:");
-                for (int p = 0; p < array.Length; p++)
-                {
-                    Parameter parameter = array[p];
-                    builder.Append($"\n\t-{parameter.Id} -- {(parameter.IsPipelined ? "(pipelined)" : null)} {parameter.Description}");
-                }
+                builder.Append($"\n\t-{parameter.Id} -- {(parameter.IsPipelined ? "(pipelined)" : null)} {parameter.Description}");
             }
+
             return builder.ToString();
+        }
+
+        private static void WriteParameterAsFlag(StringBuilder builder, string parameterId)
+        {
+            builder.Append('[');
+            builder.Append('-');
+            builder.Append(parameterId);
+            builder.Append(']');
+            builder.Append(' ');
+        }
+        
+        private static void WriteParameterAsOptional(StringBuilder builder, string parameterId)
+        {
+            builder.Append('[');
+            builder.Append('-');
+            builder.Append(parameterId);
+            builder.Append(' ');
+            builder.Append("<arg>");
+            builder.Append(']');
+            builder.Append(' ');
+        }
+
+        private static void WriteParameter(StringBuilder builder, string parameterId)
+        {
+            builder.Append('-');
+            builder.Append(parameterId);
+            builder.Append(' ');
+            builder.Append("<arg>");
+            builder.Append(' ');
         }
     }
 }

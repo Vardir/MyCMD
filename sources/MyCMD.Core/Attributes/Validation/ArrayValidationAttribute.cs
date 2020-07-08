@@ -11,18 +11,22 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
         /// A flag to specify whether array can contain null values or not (default: true)
         /// </summary>
         public bool AllowNullValues { get; set; }
+        
         /// <summary>
         /// A flag to specify whether parameter can contain null reference (default: false)
         /// </summary>
         public bool AllowArrayNullReference { get; set; }
+        
         /// <summary>
         /// Minimum length of the array (default: 0)
         /// </summary>
         public int MinLength { get; set; }
+        
         /// <summary>
         /// Maximum length of the array (default: 2 147 483 647)
         /// </summary>
         public int MaxLength { get; set; }
+        
         /// <summary>
         /// Restricts type of values that can be contained in the array (default: null)
         /// </summary>
@@ -44,29 +48,38 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
         /// <returns></returns>
         public override string Validate(object obj)
         {
-            if (!AllowArrayNullReference && obj == null)
+            if (!AllowArrayNullReference && obj is null)
                 return "array null reference is not allowed";
-            if (obj == null)
+            
+            if (obj is null)
                 return null;
+            
             if (!(obj is object[] array))
                 return $"expected array but [{obj.GetType()}] given";
+            
             if (array.Length < MinLength)
                 return $"minimal array length is {MinLength} but got {array.Length}";
+            
             if (array.Length > MaxLength)
                 return $"maximal array length is {MaxLength} but got {array.Length}";
-            if (ValueType != null)
+
+            if (ValueType is null) 
+                return null;
+            
+            foreach (var value in array)
             {
-                for (int i = 0; i < array.Length; i++)
-                {
-                    Type valueType = array[i]?.GetType();
-                    if (valueType == null && !AllowNullValues)
-                        return "null values are not allowed in the array";
-                    if (valueType == null)
-                        continue;
-                    if (valueType != ValueType)
-                        return $"expected values' type [{ValueType}] but got [{valueType}]";
-                }
+                var valueType = value?.GetType();
+                    
+                if (valueType is null && !AllowNullValues)
+                    return "null values are not allowed in the array";
+                    
+                if (valueType is null)
+                    continue;
+                    
+                if (valueType != ValueType)
+                    return $"expected values' type [{ValueType}] but got [{valueType}]";
             }
+
             return null;
         }
     }

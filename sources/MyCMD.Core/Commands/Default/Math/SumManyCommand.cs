@@ -1,10 +1,12 @@
-﻿using Vardirsoft.MyCmd.Core.Attributes;
-using Vardirsoft.MyCmd.Core.Attributes.Paramater;
+﻿using System.Linq;
+
+using Vardirsoft.MyCmd.Core.Attributes;
+using Vardirsoft.MyCmd.Core.Attributes.Parameters;
 using Vardirsoft.MyCmd.Core.Attributes.Validation;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default.Math
 {
-    [AutoRegistrate]
+    [AutoRegister]
     [Description("Sums up values in the given list")]
     public class SumManyCommand : Command
     {
@@ -19,15 +21,6 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default.Math
         /// Execution routine of the command
         /// </summary>
         /// <returns></returns>
-        protected override ExecutionResult Execute()
-        {
-            double sum = 0;
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                double value = (double)inputs[i];
-                sum += value;
-            }
-            return ExecutionResult.Success(sum);
-        }
+        protected override ExecutionResult Execute() => ExecutionResult.Success(inputs.Cast<double>().Sum());
     }
 }

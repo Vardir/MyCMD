@@ -2,7 +2,7 @@
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default
 {
-    [AutoRegistrate]
+    [AutoRegister]
     [Description("Prints out all available commands.")]
     public class CommandListCommand : Command
     {
@@ -12,10 +12,6 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default
         /// Execution routine of the command
         /// </summary>
         /// <returns></returns>
-        protected override ExecutionResult Execute()
-        {
-            var commands = ExecutionService.GetAllCommandsIDs();            
-            return ExecutionResult.Success(string.Join("; ", commands));
-        }
+        protected override ExecutionResult Execute() => ExecutionResult.Success(string.Join("; ", ExecutionService.GetAllCommandsIDs()));
     }
 }

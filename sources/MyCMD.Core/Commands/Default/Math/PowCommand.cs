@@ -3,7 +3,7 @@ using Vardirsoft.MyCmd.Core.Commands.Default.Math.Base;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default.Math
 {
-    [AutoRegistrate]
+    [AutoRegister]
     [Description("Returns a specified number raised the specified power.")]
     public class PowCommand : MathTwoArgumentsCommand
     {
@@ -13,6 +13,6 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default.Math
         /// Execution routine of the command
         /// </summary>
         /// <returns></returns>
-        protected override ExecutionResult Execute() => ExecutionResult.Success(System.Math.Pow(left, right));
+        protected override ExecutionResult Execute() => ExecutionResult.Success(System.Math.Pow(leftOperand, rightOperand));
     }
 }

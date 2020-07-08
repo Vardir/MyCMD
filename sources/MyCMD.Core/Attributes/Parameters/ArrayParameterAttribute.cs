@@ -1,18 +1,18 @@
 ﻿using System;
 
-namespace Vardirsoft.MyCmd.Core.Attributes.Paramater
+namespace Vardirsoft.MyCmd.Core.Attributes.Parameters
 {
     /// <summary>
-    /// An attribute to mark field as numeric-based parameter of a command
+    /// An attribute to mark field as array parameter of a command
     /// </summary>
-    public sealed class NumberParameterAttribute : ParameterAttribute
+    public sealed class ArrayParameterAttribute : ParameterAttribute
     {
         /// <summary>
         /// The default value of the parameter
         /// </summary>
-        public double Default { get; }
+        public object[] Default { get; }
 
-        public NumberParameterAttribute(double defaultValue = 0)
+        public ArrayParameterAttribute(object[] defaultValue = null)
         {
             Default = defaultValue;
         }
@@ -22,7 +22,7 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Paramater
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public override bool IsAllowedType(Type type) => type == typeof(double);
+        public override bool IsAllowedType(Type type) => type == typeof(object[]);
 
         /// <summary>
         /// Gets the default value of the parameter

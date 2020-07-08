@@ -11,6 +11,7 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
         /// Minimum value allowed for parameter (default: ±5,0 × 10E−324)
         /// </summary>
         public double MinValue { get; set; }
+        
         /// <summary>
         /// Maximum value allowed for parameter (default: ±1,7 × 10E308)
         /// </summary>
@@ -21,6 +22,7 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
             MinValue = double.MinValue;
             MaxValue = double.MaxValue;
         }
+        
         public NumberValidationAttribute(double minValue, double maxValue)
         {
             MinValue = minValue;
@@ -34,8 +36,9 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
         /// <returns></returns>
         public override string Validate(object value)
         {
-            if (value == null)
+            if (value is null)
                 return "number can not be null";
+            
             double d;
             try
             {
@@ -45,11 +48,11 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
             {
                 return ex.Message;
             }
+            
             if (d < MinValue)
                 return "value is lesser than minimum";
-            if (d > MaxValue)
-                return "value is greater than maximum";
-            return null;
+            
+            return d > MaxValue ? "value is greater than maximum" : null;
         }
     }
 }

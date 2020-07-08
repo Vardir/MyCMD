@@ -1,5 +1,5 @@
 ﻿using Vardirsoft.MyCmd.Core.Attributes;
-using Vardirsoft.MyCmd.Core.Attributes.Paramater;
+using Vardirsoft.MyCmd.Core.Attributes.Parameters;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default.Math.Base
 {
@@ -11,11 +11,11 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default.Math.Base
         [Pipeline]
         [NumberParameter]
         [Description("The left-side parameter")]
-        protected double left;
+        protected double leftOperand;
 
         [NumberParameter]
         [Description("The right-side parameter")]
-        protected double right;
+        protected double rightOperand;
 
         public MathTwoArgumentsCommand(string id) : base(id) { }
     }

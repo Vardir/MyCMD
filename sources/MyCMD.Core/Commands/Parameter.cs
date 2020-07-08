@@ -70,7 +70,7 @@ namespace Vardirsoft.MyCmd.Core.Commands
             this.container = container;
             if (validation != null)
             {
-                string error = validation.Validate(defaultValue);
+                var error = validation.Validate(defaultValue);
                 if (error != null)
                     throw new ArgumentException(error, nameof(defaultValue));
             }

@@ -57,7 +57,7 @@ namespace Vardirsoft.MyCmd.Core.Commands
         /// <returns></returns>
         public Command FindCommand(string id)
         {
-            if (commands.TryGetValue(id, out Command cmd))
+            if (commands.TryGetValue(id, out var cmd))
                 return cmd;
             return null;
         }
@@ -92,15 +92,15 @@ namespace Vardirsoft.MyCmd.Core.Commands
         /// </summary>
         private void LoadCommands()
         {
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            for (int i = 0; i < assemblies.Length; i++)
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            for (var i = 0; i < assemblies.Length; i++)
             {
                 if (assemblies[i].GetCustomAttribute<ContainsCommandsAttribute>() == null)
                     continue;
-                Type[] types = assemblies[i].GetTypes();
-                for (int j = 0; j < types.Length; j++)
+                var types = assemblies[i].GetTypes();
+                for (var j = 0; j < types.Length; j++)
                 {
-                    var attr = types[j].GetCustomAttribute<AutoRegistrateAttribute>();
+                    var attr = types[j].GetCustomAttribute<AutoRegisterAttribute>();
                     if (attr == null)
                         continue;
                     AddCommand(Activator.CreateInstance(types[j]) as Command);
@@ -123,7 +123,7 @@ namespace Vardirsoft.MyCmd.Core.Commands
             else if (expr.IsCPipeline)
             {
                 var cmds = Interop.extractPipeline(expr);
-                ExecutionResult result = ExecutionResult.Empty();
+                var result = ExecutionResult.Empty();
                 foreach (var cmd in cmds)
                 {
                     result = extractAndExecute(cmd.Item1, cmd.Item2, result);
@@ -145,7 +145,7 @@ namespace Vardirsoft.MyCmd.Core.Commands
 
             ExecutionResult extractAndExecute(string id, Expression query, ExecutionResult input)
             {                
-                if (commands.TryGetValue(id, out Command cmd))
+                if (commands.TryGetValue(id, out var cmd))
                     return cmd.Execute(query, input);
                 else
                     return ExecutionResult.Error($"cmd.error: can not find command '{id}'");

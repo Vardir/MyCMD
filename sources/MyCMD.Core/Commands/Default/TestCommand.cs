@@ -1,5 +1,5 @@
 ﻿using Vardirsoft.MyCmd.Core.Attributes;
-using Vardirsoft.MyCmd.Core.Attributes.Paramater;
+using Vardirsoft.MyCmd.Core.Attributes.Parameters;
 using Vardirsoft.MyCmd.Core.Attributes.Validation;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default
@@ -39,6 +39,7 @@ namespace Vardirsoft.MyCmd.Core.Commands.Default
         {
             if (bParam)
                 return ExecutionResult.Success(null);
+            
             return Error("flag is not set");
         }
     }

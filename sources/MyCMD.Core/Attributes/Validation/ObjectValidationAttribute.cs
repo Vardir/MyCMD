@@ -11,6 +11,7 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
         /// A flag to specify whether the parameter can contain null value (default: true)
         /// </summary>
         public bool AllowNulls { get; set; }
+        
         /// <summary>
         /// A restriction of value type allowed for the parameter
         /// </summary>
@@ -21,6 +22,7 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
             AllowNulls = true;
             TypeRestriction = null;
         }
+        
         public ObjectValidationAttribute(Type restriction)
         {
             AllowNulls = true;
@@ -34,10 +36,12 @@ namespace Vardirsoft.MyCmd.Core.Attributes.Validation
         /// <returns></returns>
         public override string Validate(object value)
         {
-            if (value == null && !AllowNulls)
+            if (value is null && !AllowNulls)
                 return "null values are not allowed";
-            if (TypeRestriction != null && value.GetType() != TypeRestriction)
+            
+            if (TypeRestriction != null && value?.GetType() != TypeRestriction)
                 return "object was of invalid type";
+            
             return null;
         }
     }

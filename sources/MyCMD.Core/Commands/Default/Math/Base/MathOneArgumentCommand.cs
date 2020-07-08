@@ -1,5 +1,5 @@
 ﻿using Vardirsoft.MyCmd.Core.Attributes;
-using Vardirsoft.MyCmd.Core.Attributes.Paramater;
+using Vardirsoft.MyCmd.Core.Attributes.Parameters;
 
 namespace Vardirsoft.MyCmd.Core.Commands.Default.Math.Base
 {
